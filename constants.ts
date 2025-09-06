@@ -3,31 +3,89 @@ import { Icons } from './components/Icons';
 
 export const HISTORICAL_ERAS: Era[] = [
   {
-    id: 'antiquity',
-    name: { en: 'Antiquity', fr: 'Antiquité' },
-    period: { en: '3000 BC - 500 AD', fr: '3000 av. J.-C. - 500 ap. J.-C.' },
+    id: 'prehistory',
+    name: { en: 'Prehistory', fr: 'Préhistoire' },
+    period: { en: 'c. 40,000 - 4,000 BC', fr: 'env. 40 000 - 4 000 av. J.-C.' },
     description: {
-      en: 'The era of empires like Egypt, Greece, and Rome, marked by monumental architecture and philosophy.',
-      fr: 'L\'ère des empires comme l\'Égypte, la Grèce et Rome, marquée par une architecture monumentale et la philosophie.',
+      en: 'The age before written records, marked by the rise of Homo sapiens, cave art, and the first human societies.',
+      fr: 'L\'âge avant les archives écrites, marqué par l\'essor de l\'Homo sapiens, l\'art rupestre et les premières sociétés humaines.',
+    },
+    icon: Icons.Prehistory,
+    color: 'bg-orange-900/50 border-orange-600',
+    styles: {
+      en: ['Cro-Magnon Hunter', 'Lascaux Cave Artist', 'Neolithic Villager'],
+      fr: ['Chasseur Cro-Magnon', 'Artiste de Lascaux', 'Villageois Néolithique'],
+    },
+    image: 'https://picsum.photos/seed/prehistory/800/600',
+    keyEvents: {
+      en: ['Development of stone tools', 'Creation of famous cave paintings (Lascaux, Chauvet)', 'The Agricultural Revolution'],
+      fr: ['Développement des outils en pierre', 'Création de célèbres peintures rupestres (Lascaux, Chauvet)', 'La Révolution agricole'],
+    },
+    culturalFacts: {
+      en: ['The first musical instruments, like bone flutes, were created', 'Early humans developed complex belief systems and burial rituals', 'Megalithic structures like Stonehenge were built'],
+      fr: ['Les premiers instruments de musique, comme les flûtes en os, ont été créés', 'Les premiers humains ont développé des systèmes de croyances complexes et des rituels funéraires', 'Des structures mégalithiques comme Stonehenge ont été construites'],
+    },
+    clothingStyles: {
+      en: ['Animal hides and furs', 'Simple leather loincloths and tunics', 'Jewelry made from shells, bones, and teeth'],
+      fr: ['Peaux d\'animaux et fourrures', 'Simples pagnes et tuniques en cuir', 'Bijoux faits de coquillages, d\'os et de dents'],
+    },
+    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/10/25/audio_553250b33b.mp3',
+  },
+  {
+    id: 'pharaonic_egypt',
+    name: { en: 'Pharaonic Egypt', fr: 'Égypte Pharaonique' },
+    period: { en: 'c. 3100 - 30 BC', fr: 'env. 3100 - 30 av. J.-C.' },
+    description: {
+      en: 'A majestic civilization in Northeast Africa, known for its monumental pyramids, pharaohs, and complex mythology.',
+      fr: 'Une civilisation majestueuse en Afrique du Nord-Est, connue pour ses pyramides monumentales, ses pharaons et sa mythologie complexe.',
+    },
+    icon: Icons.PharaonicEgypt,
+    color: 'bg-yellow-900/50 border-yellow-500',
+    styles: {
+      en: ['Reigning Pharaoh', 'Scribe of Thoth', 'Priestess of Isis'],
+      fr: ['Pharaon Régnant', 'Scribe de Thot', 'Prêtresse d\'Isis'],
+    },
+    image: 'https://picsum.photos/seed/egypt/800/600',
+    keyEvents: {
+      en: ['Unification of Upper and Lower Egypt', 'Building of the Great Pyramids of Giza', 'Reign of powerful pharaohs like Tutankhamun and Cleopatra'],
+      fr: ['Unification de la Haute et de la Basse-Égypte', 'Construction des Grandes Pyramides de Gizeh', 'Règne de puissants pharaons comme Toutânkhamon et Cléopâtre'],
+    },
+    culturalFacts: {
+      en: ['Development of hieroglyphic writing', 'Advanced knowledge of medicine and mathematics', 'Complex religious beliefs centered on an afterlife and mummification'],
+      fr: ['Développement de l\'écriture hiéroglyphique', 'Connaissances avancées en médecine et en mathématiques', 'Croyances religieuses complexes centrées sur l\'au-delà et la momification'],
+    },
+    clothingStyles: {
+      en: ['White linen kilts (schenti) for men', 'Simple sheath dresses (kalasiris) for women', 'Elaborate wigs, headdresses, and heavy kohl eyeliner'],
+      fr: ['Kilts en lin blanc (schenti) pour les hommes', 'Robes fourreaux simples (kalasiris) pour les femmes', 'Perruques élaborées, coiffes et eye-liner khôl épais'],
+    },
+    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/09/20/audio_03d2836217.mp3',
+  },
+  {
+    id: 'antiquity',
+    name: { en: 'Greco-Roman Antiquity', fr: 'Antiquité Gréco-Romaine' },
+    period: { en: '800 BC - 500 AD', fr: '800 av. J.-C. - 500 ap. J.-C.' },
+    description: {
+      en: 'The era of the Greek and Roman empires, which laid the foundations of Western philosophy, democracy, and law.',
+      fr: 'L\'ère des empires grec et romain, qui a jeté les bases de la philosophie, de la démocratie et du droit occidentaux.',
     },
     icon: Icons.Antiquity,
     color: 'bg-blue-900/50 border-blue-500',
     styles: {
-      en: ['Egyptian Pharaoh', 'Greek Philosopher', 'Roman Senator'],
-      fr: ['Pharaon Égyptien', 'Philosophe Grec', 'Sénateur Romain'],
+      en: ['Greek Philosopher', 'Roman Senator', 'Athenian Citizen'],
+      fr: ['Philosophe Grec', 'Sénateur Romain', 'Citoyen Athénien'],
     },
     image: 'https://picsum.photos/seed/antiquity/800/600',
     keyEvents: {
-      en: ['Building of the Great Pyramids', 'Birth of Democracy in Athens', 'Rise and Fall of the Roman Empire'],
-      fr: ['Construction des Grandes Pyramides', 'Naissance de la démocratie à Athènes', 'Apogée et chute de l\'Empire romain'],
+      en: ['Birth of Democracy in Athens', 'The Peloponnesian War', 'Rise and Fall of the Roman Empire'],
+      fr: ['Naissance de la démocratie à Athènes', 'La guerre du Péloponnèse', 'Apogée et chute de l\'Empire romain'],
     },
     culturalFacts: {
-      en: ['Invention of writing (cuneiform and hieroglyphs)', 'Olympic Games originated in ancient Greece', 'Roman law became the basis for many modern legal systems'],
-      fr: ['Invention de l\'écriture (cunéiforme et hiéroglyphes)', 'Les Jeux Olympiques sont nés en Grèce antique', 'Le droit romain est devenu la base de nombreux systèmes juridiques modernes'],
+      en: ['Olympic Games originated in ancient Greece', 'Roman law became the basis for many modern legal systems', 'Masterpieces of sculpture and architecture like the Parthenon'],
+      fr: ['Les Jeux Olympiques sont nés en Grèce antique', 'Le droit romain est devenu la base de nombreux systèmes juridiques modernes', 'Chefs-d\'œuvre de la sculpture et de l\'architecture comme le Parthénon'],
     },
     clothingStyles: {
-      en: ['Linen kilts and shendyts for Egyptians', 'Togas and stolas for Romans', 'Chitons and himations for Greeks'],
-      fr: ['Kilts en lin et chendjits pour les Égyptiens', 'Toges et stolas pour les Romains', 'Chitons et himations pour les Grecs'],
+      en: ['Togas and stolas for Romans', 'Chitons and himations for Greeks', 'Leather sandals and intricate hairstyles'],
+      fr: ['Toges et stolas pour les Romains', 'Chitons et himations pour les Grecs', 'Sandales en cuir et coiffures complexes'],
     },
     ambianceSfx: 'https://cdn.pixabay.com/audio/2022/02/07/audio_75b8795154.mp3',
   },
@@ -90,6 +148,35 @@ export const HISTORICAL_ERAS: Era[] = [
     ambianceSfx: 'https://cdn.pixabay.com/audio/2023/10/24/audio_3234d64239.mp3',
   },
   {
+    id: 'ottoman_empire',
+    name: { en: 'Ottoman Empire', fr: 'Empire Ottoman' },
+    period: { en: '1299 - 1922', fr: '1299 - 1922' },
+    description: {
+      en: 'A powerful, multicultural empire centered in Anatolia that controlled much of Southeast Europe, Western Asia, and North Africa.',
+      fr: 'Un empire multiculturel puissant centré en Anatolie qui contrôlait une grande partie de l\'Europe du Sud-Est, de l\'Asie occidentale et de l\'Afrique du Nord.',
+    },
+    icon: Icons.OttomanEmpire,
+    color: 'bg-red-800/50 border-red-400',
+    styles: {
+      en: ['Sultan\'s Courtier', 'Janissary Soldier', 'Constantinople Merchant'],
+      fr: ['Courtisan du Sultan', 'Soldat Janissaire', 'Marchand de Constantinople'],
+    },
+    image: 'https://picsum.photos/seed/ottoman/800/600',
+    keyEvents: {
+      en: ['Conquest of Constantinople in 1453', 'Reign of Suleiman the Magnificent', 'The Siege of Vienna'],
+      fr: ['Conquête de Constantinople en 1453', 'Règne de Soliman le Magnifique', 'Le siège de Vienne'],
+    },
+    culturalFacts: {
+      en: ['Flourishing of Islamic art, calligraphy, and architecture', 'Famous for its coffeehouses and intricate tilework (İznik pottery)', 'The Harem was a significant political and social institution'],
+      fr: ['Épanouissement de l\'art islamique, de la calligraphie et de l\'architecture', 'Célèbre pour ses cafés et ses carreaux de faïence complexes (poterie d\'İznik)', 'Le Harem était une institution politique et sociale importante'],
+    },
+    clothingStyles: {
+      en: ['Elaborate kaftans, turbans, and yashmaks', 'Use of rich fabrics like silk, brocade, and velvet', 'Layered clothing for both men and women'],
+      fr: ['Kaftans élaborés, turbans et yashmaks', 'Utilisation de tissus riches comme la soie, le brocart et le velours', 'Vêtements superposés pour les hommes et les femmes'],
+    },
+    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/01/27/audio_478025e103.mp3',
+  },
+  {
     id: 'victorian_era',
     name: { en: 'Victorian Era', fr: 'Ère Victorienne' },
     period: { en: '1837 - 1901', fr: '1837 - 1901' },
@@ -117,6 +204,35 @@ export const HISTORICAL_ERAS: Era[] = [
       fr: ['Crinolines, tournures et corsets pour les femmes', 'Hauts-de-forme, redingotes et gilets pour les hommes', 'Les vêtements de deuil étaient élaborés et strictement observés'],
     },
     ambianceSfx: 'https://cdn.pixabay.com/audio/2023/04/28/audio_72559598af.mp3',
+  },
+  {
+    id: 'belle_epoque',
+    name: { en: 'Belle Époque', fr: 'Belle Époque' },
+    period: { en: '1871 - 1914', fr: '1871 - 1914' },
+    description: {
+      en: 'A "Beautiful Era" of peace, prosperity, and optimism in France, marked by artistic and scientific innovation.',
+      fr: 'Une "Belle Époque" de paix, de prospérité et d\'optimisme en France, marquée par l\'innovation artistique et scientifique.',
+    },
+    icon: Icons.BelleEpoque,
+    color: 'bg-yellow-800/50 border-yellow-400',
+    styles: {
+      en: ['Parisian Artist', 'Moulin Rouge Dancer', 'Art Nouveau Socialite'],
+      fr: ['Artiste Parisien', 'Danseuse du Moulin Rouge', 'Mondaine Art Nouveau'],
+    },
+    image: 'https://picsum.photos/seed/belleepoque/800/600',
+    keyEvents: {
+      en: ['The opening of the Eiffel Tower (1889)', 'The first modern Olympic Games (1896)', 'The invention of cinema by the Lumière brothers'],
+      fr: ['L\'ouverture de la Tour Eiffel (1889)', 'Les premiers Jeux Olympiques modernes (1896)', 'L\'invention du cinéma par les frères Lumière'],
+    },
+    culturalFacts: {
+      en: ['The height of Art Nouveau style', 'Cabarets like the Moulin Rouge and Folies Bergère flourished', 'Impressionist and Post-Impressionist art movements'],
+      fr: ['L\'apogée du style Art Nouveau', 'Les cabarets comme le Moulin Rouge et les Folies Bergère prospéraient', 'Mouvements artistiques impressionnistes et post-impressionnistes'],
+    },
+    clothingStyles: {
+      en: ['S-bend corsets creating a distinctive silhouette', 'Large, extravagant hats decorated with feathers and ribbons', 'Tailored suits for men with bowler or boater hats'],
+      fr: ['Corsets en "S" créant une silhouette distinctive', 'Grands chapeaux extravagants décorés de plumes et de rubans', 'Costumes sur mesure pour hommes avec chapeaux melons ou canotiers'],
+    },
+    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/05/29/audio_d149479b13.mp3',
   },
   {
     id: 'roaring_twenties',
@@ -233,5 +349,63 @@ export const HISTORICAL_ERAS: Era[] = [
       fr: ['Costumes "power suit" avec de larges épaulettes', 'Couleurs néon, jambières et jeans délavés à l\'acide', 'Styles punk avec vestes en cuir et crêtes iroquoises'],
     },
     ambianceSfx: 'https://cdn.pixabay.com/audio/2023/06/15/audio_1721a719c8.mp3',
+  },
+  {
+    id: 'nineties',
+    name: { en: 'The Nineties', fr: 'Les Années 90' },
+    period: { en: '1990s', fr: 'Années 1990' },
+    description: {
+      en: 'A decade of grunge, pop culture, and the dawn of the public internet, defining a generation with its eclectic style.',
+      fr: 'Une décennie de grunge, de culture pop et de l\'aube de l\'internet public, définissant une génération par son style éclectique.',
+    },
+    icon: Icons.Nineties,
+    color: 'bg-indigo-800/50 border-indigo-400',
+    styles: {
+      en: ['Grunge Rocker', 'Hip-Hop Fan', 'Bubblegum Pop Star'],
+      fr: ['Rockeur Grunge', 'Fan de Hip-Hop', 'Star de la Pop Bubblegum'],
+    },
+    image: 'https://picsum.photos/seed/nineties/800/600',
+    keyEvents: {
+      en: ['The fall of the Soviet Union', 'The launch of the World Wide Web to the public', 'The release of iconic films like Jurassic Park and Pulp Fiction'],
+      fr: ['La chute de l\'Union soviétique', 'Le lancement du World Wide Web au public', 'La sortie de films emblématiques comme Jurassic Park et Pulp Fiction'],
+    },
+    culturalFacts: {
+      en: ['The rise of alternative rock and grunge music (Nirvana, Pearl Jam)', 'Hip-hop culture becomes mainstream', 'Popularity of sitcoms like "Friends" and "Seinfeld"'],
+      fr: ['L\'essor du rock alternatif et de la musique grunge (Nirvana, Pearl Jam)', 'La culture hip-hop devient grand public', 'Popularité des sitcoms comme "Friends" et "Seinfeld"'],
+    },
+    clothingStyles: {
+      en: ['Grunge: flannel shirts, ripped jeans, combat boots', 'Hip-hop: baggy jeans, oversized sports jerseys, gold chains', 'Preppy: slip dresses, plaid skirts, "The Rachel" haircut'],
+      fr: ['Grunge : chemises en flanelle, jeans déchirés, bottes de combat', 'Hip-hop : jeans baggy, maillots de sport surdimensionnés, chaînes en or', 'Preppy : robes nuisettes, jupes à carreaux, coupe de cheveux "à la Rachel"'],
+    },
+    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/11/17/audio_49e984951a.mp3',
+  },
+  {
+    id: 'two_thousands',
+    name: { en: 'The 2000s', fr: 'Les Années 2000' },
+    period: { en: '2000s', fr: 'Années 2000' },
+    description: {
+      en: 'The Y2K era of pop princesses, bling culture, and the rise of reality TV and the early social internet.',
+      fr: 'L\'ère Y2K des princesses de la pop, de la culture bling-bling, et de la montée de la télé-réalité et des débuts de l\'internet social.',
+    },
+    icon: Icons.TwoThousands,
+    color: 'bg-rose-800/50 border-rose-400',
+    styles: {
+      en: ['Y2K Pop Icon', 'Bling-Bling Rapper', 'Early Tech Enthusiast'],
+      fr: ['Icône Pop Y2K', 'Rappeur Bling-Bling', 'Passionné de Tech des débuts'],
+    },
+    image: 'https://picsum.photos/seed/2000s/800/600',
+    keyEvents: {
+      en: ['The Y2K bug scare', 'The launch of the iPod (2001) and iPhone (2007)', 'The rise of social media platforms like MySpace and Facebook'],
+      fr: ['La peur du bug de l\'an 2000', 'Le lancement de l\'iPod (2001) et de l\'iPhone (2007)', 'L\'essor des plateformes de médias sociaux comme MySpace et Facebook'],
+    },
+    culturalFacts: {
+      en: ['Reality TV shows like "Survivor" and "American Idol" dominate', 'Pop music icons like Britney Spears and Christina Aguilera', 'The peak of blockbuster fantasy film franchises like Harry Potter and Lord of the Rings'],
+      fr: ['Les émissions de télé-réalité comme "Survivor" et "American Idol" dominent', 'Les icônes de la musique pop comme Britney Spears et Christina Aguilera', 'L\'apogée des franchises de films fantastiques à succès comme Harry Potter et Le Seigneur des Anneaux'],
+    },
+    clothingStyles: {
+      en: ['Low-rise jeans, crop tops, and trucker hats', 'Velour tracksuits (Juicy Couture)', 'Von Dutch hats, oversized sunglasses, and flip phones as accessories'],
+      fr: ['Jeans taille basse, crop tops et casquettes de camionneur', 'Survêtements en velours (Juicy Couture)', 'Casquettes Von Dutch, lunettes de soleil surdimensionnées et téléphones à clapet comme accessoires'],
+    },
+    ambianceSfx: 'https://cdn.pixabay.com/audio/2023/04/24/audio_959f63d08c.mp3',
   },
 ];

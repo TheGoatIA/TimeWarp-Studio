@@ -53,6 +53,22 @@ export const Icons = {
       <line x1="12" y1="3" x2="12" y2="15" />
     </Icon>
   ),
+  Prehistory: (props: React.SVGProps<SVGSVGElement>) => ( // Mammoth
+    <Icon {...props}>
+      <path d="M10 13V7a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v6" />
+      <path d="M10 8h3" />
+      <path d="M17 11c1.5-1 2.5-3 2-5" />
+      <path d="M22 13c-1-3-3-4-5-4-1.5 0-2.5 1-4 1h-2c-1.5 0-2.5 1-4 1-2.5 0-5 2.5-5 5s2.5 5 5 5h10c2.5 0 5-2.5 5-5" />
+    </Icon>
+  ),
+  PharaonicEgypt: (props: React.SVGProps<SVGSVGElement>) => ( // Eye of Horus
+    <Icon {...props}>
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+        <circle cx="12" cy="12" r="2" />
+        <path d="M12 14v2" />
+        <path d="m15 15.5 2 1.5" />
+    </Icon>
+  ),
   Antiquity: (props: React.SVGProps<SVGSVGElement>) => ( // Parthenon
     <Icon {...props}>
       <path d="M22 18v-5H2v5" />
@@ -85,11 +101,28 @@ export const Icons = {
         <path d="M12.5 13.5 4 17" />
     </Icon>
   ),
+  OttomanEmpire: (props: React.SVGProps<SVGSVGElement>) => ( // Crescent and Star
+    <Icon {...props}>
+        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z" clipRule="evenodd"/>
+        <path d="M12 4a8 8 0 1 0 0 16 4 4 0 0 1 0-8 4 4 0 0 1 0-8Z" />
+    </Icon>
+  ),
   Victorian: (props: React.SVGProps<SVGSVGElement>) => ( // Top hat
     <Icon {...props}>
         <path d="M12 11c-2.76 0-5 .67-5 1.5S9.24 14 12 14s5-.67 5-1.5S14.76 11 12 11z" />
         <path d="M7 12.5v4c0 1.1.9 2 2 2h6a2 2 0 0 0 2-2v-4" />
         <path d="M12 4c1.93 0 3.5 1.57 3.5 3.5V11h-7V7.5C8.5 5.57 10.07 4 12 4z" />
+    </Icon>
+  ),
+  BelleEpoque: (props: React.SVGProps<SVGSVGElement>) => ( // Eiffel Tower
+    <Icon {...props}>
+        <path d="M4 22h16" />
+        <path d="M12 11c-1-3-2-6-2-8" />
+        <path d="M12 11c1-3 2-6 2-8" />
+        <path d="M12 22V3" />
+        <path d="M10 3h4" />
+        <path d="M5 16.5A13.36 13.36 0 0 1 12 14a13.36 13.36 0 0 1 7 2.5" />
+        <path d="M8 11h8" />
     </Icon>
   ),
   Twenties: (props: React.SVGProps<SVGSVGElement>) => ( // Martini glass
@@ -133,6 +166,23 @@ export const Icons = {
         <path d="M6 15h12" />
         <circle cx="8.5" cy="10.5" r="1.5" />
         <circle cx="15.5" cy="10.5" r="1.5" />
+    </Icon>
+  ),
+  Nineties: (props: React.SVGProps<SVGSVGElement>) => ( // CD
+    <Icon {...props}>
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="12" r="2" />
+    </Icon>
+  ),
+  TwoThousands: (props: React.SVGProps<SVGSVGElement>) => ( // Flip phone
+    <Icon {...props}>
+        <rect width="14" height="12" x="5" y="10" rx="2" />
+        <path d="M12 12h.01" />
+        <path d="M12 15h.01" />
+        <path d="M10 15h.01" />
+        <path d="M14 15h.01" />
+        <path d="M10 18h4" />
+        <rect width="14" height="8" x="5" y="2" rx="2" />
     </Icon>
   ),
 };
