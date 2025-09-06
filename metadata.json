@@ -1,0 +1,5 @@
+{
+  "name": "TimeWarp Studio",
+  "description": "A revolutionary web application that transforms any modern photo into authentic versions from different historical eras, using the Gemini API to create photorealistic visual time travels.",
+  "requestFramePermissions": []
+}
