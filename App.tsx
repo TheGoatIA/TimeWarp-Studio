@@ -23,6 +23,7 @@ const App: React.FC = () => {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [originalImageMimeType, setOriginalImageMimeType] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+  const [rawGeneratedImages, setRawGeneratedImages] = useState<string[]>([]);
   const [selectedEra, setSelectedEra] = useState<Era | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -132,6 +133,8 @@ const App: React.FC = () => {
         if (successfulResults.length > 0) {
           logger.info('TRANSFORMATION_SUCCESS', 'Successfully generated images from Gemini API.', { count: successfulResults.length, sessionId });
           trackEvent('transformation_success', { category: 'Transformation', label: era.id, value: successfulResults.length });
+          
+          setRawGeneratedImages(successfulResults);
           const watermarkedImages = await Promise.all(
             successfulResults.map(image => addWatermark(image))
           );
@@ -160,6 +163,7 @@ const App: React.FC = () => {
     setOriginalImage(null);
     setOriginalImageMimeType(null);
     setGeneratedImages([]);
+    setRawGeneratedImages([]);
     setSelectedEra(null);
     setError(null);
   };
@@ -201,7 +205,8 @@ const App: React.FC = () => {
           return <ResultViewer 
                     originalImage={originalImage} 
                     originalImageMimeType={originalImageMimeType}
-                    generatedImages={generatedImages} 
+                    generatedImages={generatedImages}
+                    rawGeneratedImages={rawGeneratedImages}
                     era={selectedEra} 
                     onRestart={handleRestart} 
                     language={language} 

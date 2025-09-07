@@ -12,6 +12,7 @@ interface ResultViewerProps {
   originalImage: string;
   originalImageMimeType: string;
   generatedImages: string[];
+  rawGeneratedImages: string[];
   era: Era;
   onRestart: () => void;
   language: Language;
@@ -29,12 +30,13 @@ const HistoricalContextCard: React.FC<{ title: string; items: string[]; icon: Re
 );
 
 
-export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, originalImageMimeType, generatedImages, era, onRestart, language }) => {
+export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, originalImageMimeType, generatedImages, rawGeneratedImages, era, onRestart, language }) => {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [editedImages, setEditedImages] = useState<Record<number, string>>({});
+  const [rawEditedImages, setRawEditedImages] = useState<Record<number, string>>({});
   const [editPrompt, setEditPrompt] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
@@ -43,6 +45,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const activeGeneratedImage = editedImages[activeImageIndex] || generatedImages[activeImageIndex];
+  const activeRawImage = rawEditedImages[activeImageIndex] || rawGeneratedImages[activeImageIndex];
   const t = translations[language].results;
 
   useEffect(() => {
@@ -98,8 +101,9 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
       setEditError(null);
       trackEvent('magic_edit_start', { category: 'Feature', label: editPrompt.substring(0, 50) });
       try {
-          const result = await editImage(activeGeneratedImage, originalImageMimeType, editPrompt);
+          const result = await editImage(activeRawImage, originalImageMimeType, editPrompt);
           if (result) {
+            setRawEditedImages(prev => ({...prev, [activeImageIndex]: result}));
             const watermarkedResult = await addWatermark(result);
             setEditedImages(prev => ({...prev, [activeImageIndex]: watermarkedResult}));
             setEditPrompt('');
@@ -124,7 +128,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
       setVideoUrl(null);
       trackEvent('animate_start', { category: 'Feature', label: era.id });
       try {
-          const result = await animateImage(activeGeneratedImage, originalImageMimeType);
+          const result = await animateImage(activeRawImage, originalImageMimeType);
           if (result) {
               setVideoUrl(result);
               trackEvent('animate_success', { category: 'Feature', label: era.id });

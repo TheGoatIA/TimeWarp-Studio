@@ -154,7 +154,7 @@ export const animateImage = async (
 ): Promise<string | null> => {
     try {
         logger.info('GEMINI_ANIMATE_START', 'Starting image animation.');
-        const prompt = "Animate this portrait as a short, looping video. Introduce subtle motion: gentle blinks, a slight smile, and soft, ambient movement in the background. Keep the style and character consistent with the image.";
+        const prompt = "Animate this portrait as a short, looping video, focusing on subtle, realistic motion like gentle blinks, a slight smile, and soft, ambient movement in the background. Crucially, the animated person's facial features and likeness must be an exact match to the source image, ensuring they are instantly recognizable. The overall style and character must also be preserved.";
 
         // FIX: Use veo-2.0-generate-001 for video generation with an image and prompt.
         let operation = await ai.models.generateVideos({
