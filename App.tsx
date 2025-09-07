@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ImageUploader } from './components/ImageUploader';
@@ -15,7 +16,7 @@ import { logger } from './utils/logger';
 
 type AppStep = 'UPLOAD' | 'SELECT_ERA' | 'VIEW_RESULT';
 
-const DAILY_TRANSFORMATION_LIMIT = 3;
+const DAILY_TRANSFORMATION_LIMIT = 5; // Increased limit for new features
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language | null>(null);
@@ -70,9 +71,9 @@ const App: React.FC = () => {
     updateRemainingTransforms();
   };
 
-  const handleEraSelect = useCallback(async (era: Era) => {
+  const handleEraSelect = useCallback(async (era: Era, artisticStyle: string) => {
     if (!originalImage || !originalImageMimeType || !language) return;
-    logger.info('ERA_SELECTED', 'User selected an era to transform.', { era: era.id });
+    logger.info('ERA_SELECTED', 'User selected an era to transform.', { era: era.id, artisticStyle });
     
     const today = new Date().toISOString().split('T')[0];
     let usageData = { date: '', count: 0 };
@@ -104,8 +105,6 @@ const App: React.FC = () => {
         setRemainingTransforms(Math.max(0, DAILY_TRANSFORMATION_LIMIT - newCount));
         logger.info('USAGE_INCREMENTED', 'User transformation count incremented.', { newCount });
         
-        const base64Data = originalImage.split(',')[1];
-        
         const variationStyles = era.styles[language].slice(0, 3);
         if (variationStyles.length === 0) {
           variationStyles.push('Default Style');
@@ -116,9 +115,11 @@ const App: React.FC = () => {
                 level: 'Authentic',
                 style: style,
                 environment: 'Era-appropriate setting',
-                filter: 'Era-appropriate photographic style'
+                filter: 'Era-appropriate photographic style',
+                artisticStyle: artisticStyle
             };
-            return transformImage(base64Data, originalImageMimeType, era, options, language);
+            // FIX: Pass the full originalImage data URL. The service expects to split it.
+            return transformImage(originalImage, originalImageMimeType, era, options, language);
         });
 
         const results = await Promise.all(transformationPromises);
@@ -188,8 +189,15 @@ const App: React.FC = () => {
       case 'SELECT_ERA':
         return <EraSelector onEraSelect={handleEraSelect} language={language} remainingTransforms={remainingTransforms} />;
       case 'VIEW_RESULT':
-        if (originalImage && generatedImages.length > 0 && selectedEra) {
-          return <ResultViewer originalImage={originalImage} generatedImages={generatedImages} era={selectedEra} onRestart={handleRestart} language={language} />;
+        if (originalImage && generatedImages.length > 0 && selectedEra && originalImageMimeType) {
+          return <ResultViewer 
+                    originalImage={originalImage} 
+                    originalImageMimeType={originalImageMimeType}
+                    generatedImages={generatedImages} 
+                    era={selectedEra} 
+                    onRestart={handleRestart} 
+                    language={language} 
+                 />;
         }
         handleRestart();
         return null;

@@ -53,6 +53,12 @@ export const Icons = {
       <line x1="12" y1="3" x2="12" y2="15" />
     </Icon>
   ),
+   Video: (props: React.SVGProps<SVGSVGElement>) => (
+    <Icon {...props}><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></Icon>
+  ),
+  Sparkles: (props: React.SVGProps<SVGSVGElement>) => (
+    <Icon {...props}><path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9L12 21l1.9-5.8 5.8-1.9-5.8-1.9L12 3z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></Icon>
+  ),
   Prehistory: (props: React.SVGProps<SVGSVGElement>) => ( // Mammoth
     <Icon {...props}>
       <path d="M10 13V7a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v6" />
@@ -101,14 +107,6 @@ export const Icons = {
         <path d="M12.5 13.5 4 17" />
     </Icon>
   ),
-  DynasticChina: (props: React.SVGProps<SVGSVGElement>) => ( // Fan
-    <Icon {...props}>
-      <path d="M12 12c-3 0-5.6-1.7-6.8-4H3c-.8.6-1.5 1.4-2 2.3.5.9 1.2 1.7 2 2.3h2.8c1.2-2.3 3.8-4 6.8-4s5.6 1.7 6.8 4H21c.8-.6 1.5-1.4 2-2.3-.5-.9-1.2-1.7-2-2.3h-2.2C17.6 10.3 15 12 12 12z" />
-      <path d="M12 12v9" />
-      <path d="m16.5 13.5-4.5 4.5" />
-      <path d="m7.5 13.5 4.5 4.5" />
-    </Icon>
-  ),
   FeudalJapan: (props: React.SVGProps<SVGSVGElement>) => ( // Torii Gate
     <Icon {...props}>
       <path d="M4 4c0 4 3 8 8 8s8-4 8-8" />
@@ -118,30 +116,11 @@ export const Icons = {
       <path d="M16 22V4" />
     </Icon>
   ),
-  Mesoamerican: (props: React.SVGProps<SVGSVGElement>) => ( // Step Pyramid
-    <Icon {...props}>
-      <path d="M2 22h20" />
-      <path d="M4 18h16" />
-      <path d="M6 14h12" />
-      <path d="M8 10h8" />
-      <path d="M10 6h4" />
-      <path d="M12 2v4" />
-    </Icon>
-  ),
   Victorian: (props: React.SVGProps<SVGSVGElement>) => ( // Top hat
     <Icon {...props}>
         <path d="M12 11c-2.76 0-5 .67-5 1.5S9.24 14 12 14s5-.67 5-1.5S14.76 11 12 11z" />
         <path d="M7 12.5v4c0 1.1.9 2 2 2h6a2 2 0 0 0 2-2v-4" />
         <path d="M12 4c1.93 0 3.5 1.57 3.5 3.5V11h-7V7.5C8.5 5.57 10.07 4 12 4z" />
-    </Icon>
-  ),
-  ArtNouveau: (props: React.SVGProps<SVGSVGElement>) => ( // Stylized Plant
-    <Icon {...props}>
-      <path d="M12 21V8a4 4 0 0 0-4-4H4" />
-      <path d="M12 8a4 4 0 0 1 4-4h4" />
-      <circle cx="4" cy="4" r="2" />
-      <circle cx="20" cy="4" r="2" />
-      <path d="M12 21a4 4 0 0 0 4-4v-1a4 4 0 0 1-8 0v1a4 4 0 0 0 4 4z" />
     </Icon>
   ),
   Twenties: (props: React.SVGProps<SVGSVGElement>) => ( // Martini glass
@@ -151,23 +130,40 @@ export const Icons = {
         <path d="m19 3-7 8-7-8" />
     </Icon>
   ),
-  Bauhaus: (props: React.SVGProps<SVGSVGElement>) => ( // Geometric Composition
-    <Icon {...props}>
-      <circle cx="17" cy="17" r="5" />
-      <rect x="2" y="12" width="10" height="10" rx="2" />
-      <path d="M2 8l10-6" />
-    </Icon>
-  ),
   PopArt: (props: React.SVGProps<SVGSVGElement>) => ( // Speech Bubble
     <Icon {...props}>
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </Icon>
   ),
-  The2010s: (props: React.SVGProps<SVGSVGElement>) => ( // Smartphone with heart
+  Fantasy: (props: React.SVGProps<SVGSVGElement>) => ( // Dragon
     <Icon {...props}>
-      <rect x="6" y="2" width="12" height="20" rx="2" />
-      <path d="M12 18h.01" />
-      <path d="M12 10.4c-1-1-2.5-1-3.5 0s-1 2.5 0 3.5L12 17l3.5-3.1c1-1 1-2.5 0-3.5s-2.5-1-3.5 0z" />
+        <path d="M10.43 19.3A8.4 8.4 0 0 1 5 21a3.5 3.5 0 0 1-3.5-3.5c0-1.2.4-2.3 1.1-3.2.7-.8 1.6-1.5 2.6-2L3 9c-1-1-1-2.5 0-3.5a2.5 2.5 0 0 1 3.5 0l2.3 2.3c.6-.2 1.2-.4 1.8-.5.5-.1 1.1-.1 1.6.1.6.2 1.2.5 1.7.9.6.4 1.1.9 1.5 1.5.7.9 1.2 2 1.5 3.1.3 1.2.2 2.4-.3 3.5a8.4 8.4 0 0 1-3.2 3.2" />
+        <path d="M16 14.5c.9-.9 1.5-2.1 1.5-3.5 0-2.8-2.2-5-5-5-1.4 0-2.6.5-3.5 1.5" />
+    </Icon>
+  ),
+  Cyberpunk: (props: React.SVGProps<SVGSVGElement>) => ( // Circuit board
+    <Icon {...props}>
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+        <path d="M11 9h4a2 2 0 0 0 2-2V3" />
+        <path d="M11 15h4a2 2 0 0 1 2 2v4" />
+        <path d="M14 15v- период" />
+        <path d="M7 9v6" />
+        <path d="M3 15h4" />
+        <path d="M3 9h4" />
+    </Icon>
+  ),
+  SpaceExplorer: (props: React.SVGProps<SVGSVGElement>) => ( // Rocket
+    <Icon {...props}>
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.3.05-3.05-.65-.75-2.2-.76-3.05-.05z" />
+        <path d="m12 15-3-3a2.25 2.25 0 0 1 0-3l3-3a2.25 2.25 0 0 1 3 0l3 3a2.25 2.25 0 0 1 0 3l-3 3a2.25 2.25 0 0 1-3 0z" />
+        <path d="m15 12 3 3" />
+        <path d="M9 6l3-3" />
     </Icon>
   ),
 };
+// Remove duplicate icons and unused ones.
+delete Icons['DynasticChina'];
+delete Icons['Mesoamerican'];
+delete Icons['ArtNouveau'];
+delete Icons['Bauhaus'];
+delete Icons['The2010s'];

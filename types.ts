@@ -23,6 +23,7 @@ export interface Era {
   culturalFacts: TranslatedTextArray;
   clothingStyles: TranslatedTextArray;
   ambianceSfx: string;
+  category: TranslatedText;
 }
 
 export interface TransformationOptions {
@@ -30,4 +31,5 @@ export interface TransformationOptions {
   style: string;
   environment: string;
   filter: 'Sepia' | 'Technicolor' | 'Daguerreotype' | 'Modern' | 'Era-appropriate photographic style';
+  artisticStyle?: string;
 }

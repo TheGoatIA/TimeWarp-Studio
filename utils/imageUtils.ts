@@ -1,4 +1,3 @@
-
 import { logger } from "./logger";
 
 export const addWatermark = (base64Image: string): Promise<string> => {
@@ -20,7 +19,7 @@ export const addWatermark = (base64Image: string): Promise<string> => {
       ctx.drawImage(img, 0, 0);
 
       // 2. Set watermark properties
-      const watermarkText = 'Gauty';
+      const watermarkText = 'Gauty Studio';
       const margin = img.width * 0.02; // 2% margin from edge
       const fontSize = Math.max(16, Math.round(img.width / 60)); // Proportional font size
 

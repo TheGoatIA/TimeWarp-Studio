@@ -1,12 +1,17 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { Era, Language } from '../types';
 import { Icons } from './Icons';
 import { translations } from '../translations';
 import { logger } from '../utils/logger';
+import { editImage, animateImage } from '../services/geminiService';
+import { VideoLoadingIndicator } from './VideoLoadingIndicator';
+import { addWatermark } from '../utils/imageUtils';
 
 interface ResultViewerProps {
   originalImage: string;
+  originalImageMimeType: string;
   generatedImages: string[];
   era: Era;
   onRestart: () => void;
@@ -25,51 +30,30 @@ const HistoricalContextCard: React.FC<{ title: string; items: string[]; icon: Re
 );
 
 
-export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, generatedImages, era, onRestart, language }) => {
+export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, originalImageMimeType, generatedImages, era, onRestart, language }) => {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [canShare, setCanShare] = useState(false);
+  const [editedImages, setEditedImages] = useState<Record<number, string>>({});
+  const [editPrompt, setEditPrompt] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationError, setAnimationError] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
-  const activeGeneratedImage = generatedImages[activeImageIndex];
+  const activeGeneratedImage = editedImages[activeImageIndex] || generatedImages[activeImageIndex];
   const t = translations[language].results;
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && navigator.share) {
-      setCanShare(true);
-    }
-    
-    if (era.ambianceSfx) {
-        audioRef.current = new Audio(era.ambianceSfx);
-        audioRef.current.loop = true;
-    }
-    
     return () => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            logger.info('AUDIO_CLEANUP', 'Audio paused and cleaned up on component unmount.');
-        }
-        audioRef.current = null;
+      if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+        logger.info('VIDEO_URL_CLEANUP', 'Video URL revoked on unmount.');
+      }
     };
-  }, [era.ambianceSfx]);
-
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-        audioRef.current.pause();
-        logger.info('AUDIO_PAUSE', 'User paused ambient audio.', { eraId: era.id });
-    } else {
-        audioRef.current.play().catch(e => {
-            console.error("Audio play failed:", e)
-            logger.error('AUDIO_PLAY_ERROR', 'Failed to play ambient audio.', { eraId: era.id, error: e });
-        });
-        logger.info('AUDIO_PLAY', 'User started ambient audio.', { eraId: era.id });
-    }
-    setIsPlaying(!isPlaying);
-  };
+  }, [videoUrl]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!isDragging || !containerRef.current) return;
@@ -108,36 +92,46 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, gener
     logger.info('IMAGE_DOWNLOAD', 'User downloaded a generated image.', { eraId: era.id, imageIndex: activeImageIndex });
   };
 
-  const handleShare = async () => {
-    const eraName = era.name[language].replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    const fileName = `timewarp_studio_${eraName}_${activeImageIndex + 1}.png`;
-    logger.info('IMAGE_SHARE_ATTEMPT', 'User is attempting to share an image.', { eraId: era.id, imageIndex: activeImageIndex });
-
-    try {
-      const response = await fetch(activeGeneratedImage);
-      const blob = await response.blob();
-      const file = new File([blob], fileName, { type: blob.type });
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: t.shareTitle,
-          text: t.shareText(era.name[language]),
-        });
-        logger.info('IMAGE_SHARE_SUCCESS', 'User successfully shared an image via Web Share API.');
-      } else {
-        alert(t.shareErrorBrowser);
-        logger.warn('IMAGE_SHARE_UNSUPPORTED', 'Web Share API for files is not supported in this browser.');
+  const handleMagicEdit = async () => {
+      if (!editPrompt.trim()) return;
+      setIsEditing(true);
+      setEditError(null);
+      try {
+          const result = await editImage(activeGeneratedImage, originalImageMimeType, editPrompt);
+          if (result) {
+            const watermarkedResult = await addWatermark(result);
+            setEditedImages(prev => ({...prev, [activeImageIndex]: watermarkedResult}));
+            setEditPrompt('');
+          } else {
+            setEditError(t.magicEdit.error);
+          }
+      } catch (e) {
+          console.error(e);
+          setEditError(t.magicEdit.error);
+          logger.error('MAGIC_EDIT_FAILED', 'Magic Edit call failed.', { error: e });
+      } finally {
+          setIsEditing(false);
       }
-    } catch (error) {
-      if ((error as Error).name !== 'AbortError') {
-        console.error('Error sharing:', error);
-        alert(t.shareErrorGeneral);
-        logger.error('IMAGE_SHARE_ERROR', 'An error occurred during the sharing process.', { error });
-      } else {
-        logger.info('IMAGE_SHARE_ABORTED', 'User aborted the share dialog.');
+  };
+
+  const handleAnimate = async () => {
+      setIsAnimating(true);
+      setAnimationError(null);
+      setVideoUrl(null);
+      try {
+          const result = await animateImage(activeGeneratedImage, originalImageMimeType);
+          if (result) {
+              setVideoUrl(result);
+          } else {
+              setAnimationError(t.livingPortrait.error);
+          }
+      } catch (e) {
+          console.error(e);
+          setAnimationError(t.livingPortrait.error);
+          logger.error('ANIMATION_FAILED', 'Animation call failed.', { error: e });
+      } finally {
+          setIsAnimating(false);
       }
-    }
   };
 
   return (
@@ -183,7 +177,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, gener
                 {generatedImages.map((img, index) => (
                     <img
                         key={index}
-                        src={img}
+                        src={editedImages[index] || img}
                         alt={`${t.variation} ${index + 1}`}
                         className={`w-20 h-20 md:w-24 md:h-24 object-cover rounded-md cursor-pointer border-2 transition-all ${activeImageIndex === index ? 'border-amber-400 scale-110' : 'border-transparent hover:border-amber-400/50'}`}
                         onClick={() => setActiveImageIndex(index)}
@@ -198,28 +192,44 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, gener
           <Icons.Download className="w-5 h-5 mr-2" />
           <span>{t.download}</span>
         </button>
-        {canShare && (
-          <button onClick={handleShare} className="bg-gray-800 text-amber-300 border border-amber-500/50 font-bold py-2 px-6 rounded-full flex items-center justify-center hover:bg-amber-500 hover:text-gray-900 hover:border-amber-500 transition-all duration-300 transform hover:scale-105">
-            <Icons.Share className="w-5 h-5 mr-2" />
-            <span>{t.share}</span>
-          </button>
-        )}
       </div>
 
-      <div className="w-full max-w-4xl bg-gray-900/50 p-6 rounded-lg border border-amber-500/30">
+      {/* New Features Section */}
+      <div className="w-full max-w-4xl grid md:grid-cols-2 gap-6 my-6">
+        {/* Magic Edit */}
+        <div className="bg-gray-900/50 p-6 rounded-lg border border-purple-500/30">
+          <h3 className="text-xl font-cinzel text-purple-300 mb-4 flex items-center"><Icons.Sparkles className="w-5 h-5 mr-2" /> {t.magicEdit.title}</h3>
+          <div className="flex space-x-2">
+            <input type="text" value={editPrompt} onChange={(e) => setEditPrompt(e.target.value)} placeholder={t.magicEdit.prompt} className="flex-grow bg-gray-800 border border-gray-700 rounded-full px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+            <button onClick={handleMagicEdit} disabled={isEditing} className="bg-purple-600 text-white font-bold py-2 px-4 rounded-full hover:bg-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              {isEditing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <span>{t.magicEdit.button}</span>}
+            </button>
+          </div>
+          {editError && <p className="text-red-400 text-sm mt-2">{editError}</p>}
+        </div>
+
+        {/* Living Portrait */}
+        <div className="bg-gray-900/50 p-6 rounded-lg border border-cyan-500/30 flex flex-col justify-center items-center">
+            <h3 className="text-xl font-cinzel text-cyan-300 mb-4 flex items-center"><Icons.Video className="w-5 h-5 mr-2" /> {t.livingPortrait.button}</h3>
+            <button onClick={handleAnimate} disabled={isAnimating || !!videoUrl} className="bg-cyan-600 text-white font-bold py-2 px-6 rounded-full hover:bg-cyan-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              {isAnimating ? "Creating..." : (videoUrl ? "Created!" : "Animate")}
+            </button>
+            {animationError && <p className="text-red-400 text-sm mt-2">{animationError}</p>}
+        </div>
+      </div>
+
+      {isAnimating && <VideoLoadingIndicator language={language} />}
+
+      {videoUrl && (
+          <div className="w-full max-w-4xl my-6 animate-fade-in">
+              <h3 className="text-2xl font-cinzel text-center text-amber-300 mb-4">{t.livingPortrait.title}</h3>
+              <video src={videoUrl} controls autoPlay loop className="w-full max-w-md mx-auto rounded-lg border-2 border-amber-500/50" />
+          </div>
+      )}
+
+      <div className="w-full max-w-4xl bg-gray-900/50 p-6 rounded-lg border border-amber-500/30 mt-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <h3 className="text-2xl font-cinzel text-amber-300 mb-4 md:mb-0">{t.contextTitle}</h3>
-            {era.ambianceSfx && (
-                <div className="flex items-center space-x-3 bg-black/30 p-2 rounded-full">
-                    <button onClick={togglePlay} className="w-10 h-10 rounded-full bg-amber-500 hover:bg-amber-400 text-gray-900 flex items-center justify-center transition-colors">
-                        {isPlaying ? <Icons.Pause className="w-5 h-5"/> : <Icons.Play className="w-5 h-5"/>}
-                    </button>
-                    <div>
-                        <p className="font-bold text-white text-sm">{t.ambianceTitle}</p>
-                        <p className="text-xs text-gray-400">{t.ambianceSubtitle(era.name[language])}</p>
-                    </div>
-                </div>
-            )}
         </div>
         <div className="grid md:grid-cols-3 gap-6">
             <HistoricalContextCard title={t.keyEvents} items={era.keyEvents[language]} icon={<Icons.BookOpen />} />
