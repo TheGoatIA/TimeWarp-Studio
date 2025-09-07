@@ -33,13 +33,13 @@ export const translations = {
         button: "Transform",
         cancel: "Cancel",
         styles: {
-          'Default': 'Default',
-          'Oil Painting': 'Oil Painting',
-          'Charcoal Drawing': 'Charcoal Drawing',
-          'Cinematic': 'Cinematic',
-          'Grainy Photo': 'Grainy Photo',
-          'Intense Sepia': 'Intense Sepia',
-          'Watercolor': 'Watercolor',
+          'Default': { name: 'Default', description: 'A balanced and photorealistic transformation true to the era.' },
+          'Oil Painting': { name: 'Oil Painting', description: 'Reimagines your photo as a classic, textured oil painting.' },
+          'Charcoal Drawing': { name: 'Charcoal Drawing', description: 'A dramatic, high-contrast sketch in black and white.' },
+          'Cinematic': { name: 'Cinematic', description: 'Adds dramatic lighting and a wide-screen feel, like a still from a movie.' },
+          'Grainy Photo': { name: 'Grainy Photo', description: 'Simulates the look of an old, vintage photograph with film grain.' },
+          'Intense Sepia': { name: 'Intense Sepia', description: 'A deep, warm brown monochrome tone for a strong nostalgic effect.' },
+          'Watercolor': { name: 'Watercolor', description: 'A soft, blended, and artistic look with light, transparent colors.' },
         }
       }
     },
@@ -118,13 +118,13 @@ export const translations = {
         button: "Transformer",
         cancel: "Annuler",
         styles: {
-          'Default': 'Défaut',
-          'Oil Painting': 'Peinture à l\'huile',
-          'Charcoal Drawing': 'Dessin au fusain',
-          'Cinematic': 'Cinématique',
-          'Grainy Photo': 'Photo granuleuse',
-          'Intense Sepia': 'Sépia intense',
-          'Watercolor': 'Aquarelle',
+          'Default': { name: 'Défaut', description: 'Une transformation équilibrée et photoréaliste fidèle à l\'époque.' },
+          'Oil Painting': { name: 'Peinture à l\'huile', description: 'Réinvente votre photo en une peinture à l\'huile classique et texturée.' },
+          'Charcoal Drawing': { name: 'Dessin au fusain', description: 'Une esquisse dramatique à fort contraste en noir et blanc.' },
+          'Cinematic': { name: 'Cinématique', description: 'Ajoute un éclairage dramatique et un aspect grand écran, comme une image de film.' },
+          'Grainy Photo': { name: 'Photo granuleuse', description: 'Simule l\'aspect d\'une vieille photographie vintage avec du grain de film.' },
+          'Intense Sepia': { name: 'Sépia intense', description: 'Un ton monochrome brun chaud et profond pour un fort effet nostalgique.' },
+          'Watercolor': { name: 'Aquarelle', description: 'Un aspect doux, fondu et artistique avec des couleurs légères et transparentes.' },
         }
       }
     },

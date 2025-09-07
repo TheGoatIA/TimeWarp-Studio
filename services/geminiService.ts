@@ -46,6 +46,7 @@ const extractImageFromResponse = (response: GenerateContentResponse): string | n
  * @param era The selected era for transformation.
  * @param options Additional transformation options.
  * @param language The selected language for prompt generation.
+ * @param sessionId A unique identifier for this transformation session.
  * @returns A promise that resolves to the base64 data URL of the new image, or null on failure.
  */
 export const transformImage = async (
@@ -53,7 +54,8 @@ export const transformImage = async (
     originalImageMimeType: string,
     era: Era,
     options: TransformationOptions,
-    language: Language
+    language: Language,
+    sessionId: string
 ): Promise<string | null> => {
     try {
         const prompt = `Transform the person in the provided image to fit the ${era.name[language]} era (${era.period[language]}). The style should be: ${options.style}. The overall artistic style is: ${options.artisticStyle}. The environment should be an ${options.environment}. The final image should look like an ${options.filter}. Description of the era for context: ${era.description[language]}. Ensure the person's face is clearly visible and recognizable. The output must be only the image, with no text or borders.`;
@@ -79,14 +81,14 @@ export const transformImage = async (
         
         const imageUrl = extractImageFromResponse(response);
         if (imageUrl) {
-            logger.info('GEMINI_TRANSFORM_SUCCESS', 'Image transformed successfully.', { era: era.id });
+            logger.info('GEMINI_TRANSFORM_SUCCESS', 'Image transformed successfully.', { era: era.id, sessionId });
             return imageUrl;
         } else {
-            logger.warn('GEMINI_TRANSFORM_NO_IMAGE', 'Gemini response did not contain an image.', { era: era.id, response });
+            logger.warn('GEMINI_TRANSFORM_NO_IMAGE', 'Gemini response did not contain an image.', { era: era.id, response, sessionId });
             return null;
         }
     } catch (error) {
-        logger.error('GEMINI_TRANSFORM_ERROR', 'Error calling Gemini API for transformImage.', { error });
+        logger.error('GEMINI_TRANSFORM_ERROR', 'Error calling Gemini API for transformImage.', { error, sessionId });
         console.error('Gemini transformImage error:', error);
         return null;
     }

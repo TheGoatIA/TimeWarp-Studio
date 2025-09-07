@@ -1,5 +1,3 @@
-
-
 import React, { useState, useRef, useEffect } from 'react';
 import type { Era, Language } from '../types';
 import { Icons } from './Icons';
@@ -8,6 +6,7 @@ import { logger } from '../utils/logger';
 import { editImage, animateImage } from '../services/geminiService';
 import { VideoLoadingIndicator } from './VideoLoadingIndicator';
 import { addWatermark } from '../utils/imageUtils';
+import { trackEvent } from '../services/analyticsService';
 
 interface ResultViewerProps {
   originalImage: string;
@@ -90,25 +89,30 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
     link.click();
     document.body.removeChild(link);
     logger.info('IMAGE_DOWNLOAD', 'User downloaded a generated image.', { eraId: era.id, imageIndex: activeImageIndex });
+    trackEvent('download_image', { category: 'Engagement', label: era.id });
   };
 
   const handleMagicEdit = async () => {
       if (!editPrompt.trim()) return;
       setIsEditing(true);
       setEditError(null);
+      trackEvent('magic_edit_start', { category: 'Feature', label: editPrompt.substring(0, 50) });
       try {
           const result = await editImage(activeGeneratedImage, originalImageMimeType, editPrompt);
           if (result) {
             const watermarkedResult = await addWatermark(result);
             setEditedImages(prev => ({...prev, [activeImageIndex]: watermarkedResult}));
             setEditPrompt('');
+            trackEvent('magic_edit_success', { category: 'Feature', label: era.id });
           } else {
             setEditError(t.magicEdit.error);
+            trackEvent('magic_edit_error', { category: 'Error', label: 'no_image_returned' });
           }
       } catch (e) {
           console.error(e);
           setEditError(t.magicEdit.error);
           logger.error('MAGIC_EDIT_FAILED', 'Magic Edit call failed.', { error: e });
+          trackEvent('magic_edit_error', { category: 'Error', label: (e instanceof Error ? e.message : 'unknown') });
       } finally {
           setIsEditing(false);
       }
@@ -118,17 +122,21 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
       setIsAnimating(true);
       setAnimationError(null);
       setVideoUrl(null);
+      trackEvent('animate_start', { category: 'Feature', label: era.id });
       try {
           const result = await animateImage(activeGeneratedImage, originalImageMimeType);
           if (result) {
               setVideoUrl(result);
+              trackEvent('animate_success', { category: 'Feature', label: era.id });
           } else {
               setAnimationError(t.livingPortrait.error);
+              trackEvent('animate_error', { category: 'Error', label: 'no_video_returned' });
           }
       } catch (e) {
           console.error(e);
           setAnimationError(t.livingPortrait.error);
           logger.error('ANIMATION_FAILED', 'Animation call failed.', { error: e });
+          trackEvent('animate_error', { category: 'Error', label: (e instanceof Error ? e.message : 'unknown') });
       } finally {
           setIsAnimating(false);
       }

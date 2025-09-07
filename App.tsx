@@ -1,5 +1,3 @@
-
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ImageUploader } from './components/ImageUploader';
@@ -13,10 +11,11 @@ import { transformImage } from './services/geminiService';
 import { translations } from './translations';
 import { addWatermark } from './utils/imageUtils';
 import { logger } from './utils/logger';
+import { trackEvent } from './services/analyticsService';
 
 type AppStep = 'UPLOAD' | 'SELECT_ERA' | 'VIEW_RESULT';
 
-const DAILY_TRANSFORMATION_LIMIT = 5; // Increased limit for new features
+const DAILY_TRANSFORMATION_LIMIT = 3; // Increased limit for new features
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language | null>(null);
@@ -60,11 +59,13 @@ const App: React.FC = () => {
 
   const handleLanguageSelect = (lang: Language) => {
     logger.info('LANGUAGE_SELECT', `Language selected: ${lang}`);
+    trackEvent('language_select', { category: 'Engagement', label: lang });
     setLanguage(lang);
   };
 
   const handleImageUpload = (imageDataUrl: string, mimeType: string) => {
     logger.info('IMAGE_UPLOAD', 'Image successfully uploaded by user.', { mimeType });
+    trackEvent('image_upload', { category: 'Transformation', label: mimeType });
     setOriginalImage(imageDataUrl);
     setOriginalImageMimeType(mimeType);
     setStep('SELECT_ERA');
@@ -73,7 +74,9 @@ const App: React.FC = () => {
 
   const handleEraSelect = useCallback(async (era: Era, artisticStyle: string) => {
     if (!originalImage || !originalImageMimeType || !language) return;
-    logger.info('ERA_SELECTED', 'User selected an era to transform.', { era: era.id, artisticStyle });
+    const sessionId = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
+    logger.info('ERA_SELECTED', 'User selected an era to transform.', { era: era.id, artisticStyle, sessionId });
+    trackEvent('transformation_start', { category: 'Transformation', label: era.id, value: 1 });
     
     const today = new Date().toISOString().split('T')[0];
     let usageData = { date: '', count: 0 };
@@ -83,14 +86,15 @@ const App: React.FC = () => {
             usageData = JSON.parse(usageDataString);
         }
     } catch(e) {
-        logger.error('USAGE_PARSE_ERROR_ON_TRANSFORM', 'Failed to parse usage data during transformation.', { error: e });
+        logger.error('USAGE_PARSE_ERROR_ON_TRANSFORM', 'Failed to parse usage data during transformation.', { error: e, sessionId });
         localStorage.removeItem('timeWarpUsage');
     }
 
     if (usageData.date === today && usageData.count >= DAILY_TRANSFORMATION_LIMIT) {
       const limitError = translations[language].error.limitReached;
       setError(limitError);
-      logger.warn('LIMIT_REACHED', 'User attempted transformation but has reached the daily limit.');
+      logger.warn('LIMIT_REACHED', 'User attempted transformation but has reached the daily limit.', { sessionId });
+      trackEvent('transformation_limit_reached', { category: 'Error', label: era.id });
       return;
     }
     
@@ -103,7 +107,7 @@ const App: React.FC = () => {
         const newCount = usageData.date === today ? usageData.count + 1 : 1;
         localStorage.setItem('timeWarpUsage', JSON.stringify({ date: today, count: newCount }));
         setRemainingTransforms(Math.max(0, DAILY_TRANSFORMATION_LIMIT - newCount));
-        logger.info('USAGE_INCREMENTED', 'User transformation count incremented.', { newCount });
+        logger.info('USAGE_INCREMENTED', 'User transformation count incremented.', { newCount, sessionId });
         
         const variationStyles = era.styles[language].slice(0, 3);
         if (variationStyles.length === 0) {
@@ -119,14 +123,15 @@ const App: React.FC = () => {
                 artisticStyle: artisticStyle
             };
             // FIX: Pass the full originalImage data URL. The service expects to split it.
-            return transformImage(originalImage, originalImageMimeType, era, options, language);
+            return transformImage(originalImage, originalImageMimeType, era, options, language, sessionId);
         });
 
         const results = await Promise.all(transformationPromises);
         const successfulResults = results.filter((res): res is string => res !== null);
         
         if (successfulResults.length > 0) {
-          logger.info('TRANSFORMATION_SUCCESS', 'Successfully generated images from Gemini API.', { count: successfulResults.length });
+          logger.info('TRANSFORMATION_SUCCESS', 'Successfully generated images from Gemini API.', { count: successfulResults.length, sessionId });
+          trackEvent('transformation_success', { category: 'Transformation', label: era.id, value: successfulResults.length });
           const watermarkedImages = await Promise.all(
             successfulResults.map(image => addWatermark(image))
           );
@@ -134,11 +139,13 @@ const App: React.FC = () => {
           setStep('VIEW_RESULT');
         } else {
           setError(translations[language].error.noImage);
-           logger.warn('TRANSFORMATION_NO_IMAGE', 'Gemini API returned no valid images.');
+           logger.warn('TRANSFORMATION_NO_IMAGE', 'Gemini API returned no valid images.', { sessionId });
+           trackEvent('transformation_error', { category: 'Error', label: 'no_image_returned' });
         }
     } catch (e) {
       console.error(e);
-      logger.error('TRANSFORMATION_ERROR', 'An error occurred during the image transformation process.', { error: e });
+      logger.error('TRANSFORMATION_ERROR', 'An error occurred during the image transformation process.', { error: e, sessionId });
+      trackEvent('transformation_error', { category: 'Error', label: (e instanceof Error ? e.message : 'unknown') });
       // Display a generic, user-friendly error message, regardless of the underlying technical issue.
       setError(translations[language].error.unknown);
     } finally {
@@ -148,6 +155,7 @@ const App: React.FC = () => {
 
   const handleRestart = () => {
     logger.info('RESTART_APP', 'User restarted the process.');
+    trackEvent('restart_app', { category: 'Engagement' });
     setStep('UPLOAD');
     setOriginalImage(null);
     setOriginalImageMimeType(null);

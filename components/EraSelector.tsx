@@ -64,9 +64,14 @@ const StyleModifierModal: React.FC<{ era: Era; language: Language; onClose: () =
                             onClick={() => setSelectedStyle(style)}
                             className={`p-3 rounded-lg border-2 transition-all duration-200 font-semibold ${selectedStyle === style ? 'bg-amber-500 text-gray-900 border-amber-400 scale-105' : 'bg-gray-800 text-gray-300 border-gray-700 hover:border-amber-500/50'}`}
                         >
-                            {t.styles[style as keyof typeof t.styles] || style}
+                            {t.styles[style as keyof typeof t.styles]?.name || style}
                         </button>
                     ))}
+                </div>
+                <div className="mt-6 p-4 bg-gray-800/50 border border-gray-700 rounded-lg text-center min-h-[70px] flex items-center justify-center transition-all duration-300">
+                    <p className="text-gray-300 italic font-crimson">
+                        {t.styles[selectedStyle as keyof typeof t.styles]?.description}
+                    </p>
                 </div>
                 <div className="mt-8 flex justify-center space-x-4">
                     <button onClick={onClose} className="bg-gray-700 text-white font-bold py-2 px-6 rounded-full hover:bg-gray-600 transition-colors">
