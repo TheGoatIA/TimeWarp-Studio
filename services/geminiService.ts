@@ -181,8 +181,19 @@ export const animateImage = async (
 
         if (downloadLink) {
             logger.info('GEMINI_ANIMATE_FETCHING', 'Video generated, fetching video data.', { downloadLink });
-            // FIX: Append API key to fetch the video from the download link, as per guidelines.
-            const response = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
+            
+            // FIX: Retrieve the API key from the initialized `ai` client instance.
+            // This is a robust way to handle production build environments where `process.env.API_KEY`
+            // might not be correctly substituted for all uses, causing fetch errors.
+            // Since the `ai` client's earlier calls succeeded, we can trust it holds a valid key.
+            const apiKey = (ai as any).apiKey;
+
+            if (!apiKey || typeof apiKey !== 'string') {
+                 logger.error('GEMINI_ANIMATE_NO_API_KEY', 'Could not retrieve a valid API key from the GoogleGenAI client instance.');
+                 throw new Error('Could not retrieve a valid API key from the GoogleGenAI client instance.');
+            }
+            
+            const response = await fetch(`${downloadLink}&key=${apiKey}`);
 
             if (!response.ok) {
                 const errorText = await response.text();
