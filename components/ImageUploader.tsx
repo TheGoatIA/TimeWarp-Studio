@@ -89,6 +89,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, lan
           </div>
         </div>
       {error && <p className="mt-4 text-red-400">{error}</p>}
+      <p 
+        className="mt-6 text-sm text-gray-400 font-crimson text-center"
+        dangerouslySetInnerHTML={{ __html: t.recommendation }}
+      />
     </div>
   );
 };

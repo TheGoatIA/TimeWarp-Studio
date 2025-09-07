@@ -15,6 +15,7 @@ export const translations = {
       dragAndDrop: 'Drag & drop your photo here',
       or: 'or',
       button: 'Start the Time Travel',
+      recommendation: '💡 **Pro Tip:** For best results, use a clear, well-lit photo where the face is prominent and looking towards the camera.',
       error: {
         notImage: 'Please select an image file (e.g., JPG, PNG, WEBP).',
         tooLarge: 'Image is too large. Please select a file smaller than 4MB.',
@@ -72,6 +73,7 @@ export const translations = {
       dragAndDrop: 'Glissez-déposez votre photo ici',
       or: 'ou',
       button: 'Commencer le voyage temporel',
+      recommendation: '💡 **Conseil :** Pour de meilleurs résultats, utilisez une photo nette et bien éclairée où le visage est bien visible et regarde vers l\'appareil photo.',
       error: {
         notImage: 'Veuillez sélectionner un fichier image (ex: JPG, PNG, WEBP).',
         tooLarge: 'L\'image est trop grande. Veuillez sélectionner un fichier de moins de 4 Mo.',
