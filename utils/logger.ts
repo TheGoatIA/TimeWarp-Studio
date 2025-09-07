@@ -9,7 +9,18 @@ interface LogDetails {
   [key: string]: any;
 }
 
+// Check for a debug flag in the URL to enable logging in production.
+// This is a simple and effective way for developers to access logs without
+// cluttering the console for regular users.
+// To enable, add `?debug=true` to the application URL.
+const isLoggingEnabled = new URLSearchParams(window.location.search).has('debug');
+
 const log = (level: LogLevel, event: string, message: string, details?: LogDetails) => {
+  // Only execute the log function if the debug flag is present in the URL.
+  if (!isLoggingEnabled) {
+    return;
+  }
+
   const logObject = {
     timestamp: new Date().toISOString(),
     level,

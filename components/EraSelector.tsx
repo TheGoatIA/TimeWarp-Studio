@@ -20,7 +20,6 @@ const EraCard: React.FC<{ era: Era; onSelect: () => void; language: Language, di
       onClick={!disabled ? onSelect : undefined}
       aria-disabled={disabled}
     >
-      <img src={era.image} alt={era.name[language]} className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity duration-300" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
       <div className="relative p-6 flex flex-col justify-end h-72">
         <era.icon className="w-12 h-12 text-amber-300 mb-4" />
