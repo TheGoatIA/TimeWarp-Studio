@@ -8,8 +8,8 @@ interface LanguageSelectorProps {
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelectLanguage }) => {
   return (
     <div className="flex flex-col items-center justify-center text-center animate-fade-in">
-      {/* Path is root-relative, served from the 'public' directory */}
-      <img src="/logo_timewarp.png" alt="TimeWarp Studio Logo" className="h-16 w-16 md:h-24 md:w-24 mb-6" />
+      {/* Path is prefixed with /public/ to match server routing */}
+      <img src="/public/logo_timewarp.png" alt="TimeWarp Studio Logo" className="h-16 w-16 md:h-24 md:w-24 mb-6" />
       <h1 className="text-3xl md:text-5xl font-cinzel font-bold text-white mb-4">
         Welcome to TimeWarp <span className="text-amber-400">Studio</span>
       </h1>

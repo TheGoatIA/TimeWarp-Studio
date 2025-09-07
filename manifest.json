@@ -8,12 +8,12 @@
   "theme_color": "#1A1A1A",
   "icons": [
     {
-      "src": "/logo_timewarp.png",
+      "src": "/public/logo_timewarp.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/logo_timewarp.png",
+      "src": "/public/logo_timewarp.png",
       "type": "image/png",
       "sizes": "512x512"
     }
