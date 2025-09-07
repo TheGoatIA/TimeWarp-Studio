@@ -1,7 +1,9 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { Era, Language } from '../types';
 import { Icons } from './Icons';
 import { translations } from '../translations';
+import { logger } from '../utils/logger';
 
 interface ResultViewerProps {
   originalImage: string;
@@ -46,7 +48,10 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, gener
     }
     
     return () => {
-        audioRef.current?.pause();
+        if (audioRef.current) {
+            audioRef.current.pause();
+            logger.info('AUDIO_CLEANUP', 'Audio paused and cleaned up on component unmount.');
+        }
         audioRef.current = null;
     };
   }, [era.ambianceSfx]);
@@ -55,8 +60,13 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, gener
     if (!audioRef.current) return;
     if (isPlaying) {
         audioRef.current.pause();
+        logger.info('AUDIO_PAUSE', 'User paused ambient audio.', { eraId: era.id });
     } else {
-        audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+        audioRef.current.play().catch(e => {
+            console.error("Audio play failed:", e)
+            logger.error('AUDIO_PLAY_ERROR', 'Failed to play ambient audio.', { eraId: era.id, error: e });
+        });
+        logger.info('AUDIO_PLAY', 'User started ambient audio.', { eraId: era.id });
     }
     setIsPlaying(!isPlaying);
   };
@@ -95,11 +105,13 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, gener
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    logger.info('IMAGE_DOWNLOAD', 'User downloaded a generated image.', { eraId: era.id, imageIndex: activeImageIndex });
   };
 
   const handleShare = async () => {
     const eraName = era.name[language].replace(/[^a-z0-9]/gi, '_').toLowerCase();
     const fileName = `timewarp_studio_${eraName}_${activeImageIndex + 1}.png`;
+    logger.info('IMAGE_SHARE_ATTEMPT', 'User is attempting to share an image.', { eraId: era.id, imageIndex: activeImageIndex });
 
     try {
       const response = await fetch(activeGeneratedImage);
@@ -112,13 +124,18 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, gener
           title: t.shareTitle,
           text: t.shareText(era.name[language]),
         });
+        logger.info('IMAGE_SHARE_SUCCESS', 'User successfully shared an image via Web Share API.');
       } else {
         alert(t.shareErrorBrowser);
+        logger.warn('IMAGE_SHARE_UNSUPPORTED', 'Web Share API for files is not supported in this browser.');
       }
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
         console.error('Error sharing:', error);
         alert(t.shareErrorGeneral);
+        logger.error('IMAGE_SHARE_ERROR', 'An error occurred during the sharing process.', { error });
+      } else {
+        logger.info('IMAGE_SHARE_ABORTED', 'User aborted the share dialog.');
       }
     }
   };

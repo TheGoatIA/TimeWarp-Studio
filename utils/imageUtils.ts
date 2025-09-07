@@ -1,3 +1,6 @@
+
+import { logger } from "./logger";
+
 export const addWatermark = (base64Image: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -8,7 +11,9 @@ export const addWatermark = (base64Image: string): Promise<string> => {
       const ctx = canvas.getContext('2d');
 
       if (!ctx) {
-        return reject(new Error('Could not get canvas context'));
+        const error = new Error('Could not get canvas context');
+        logger.error('WATERMARK_ERROR', 'Failed to get 2D context from canvas for watermarking.', { error });
+        return reject(error);
       }
 
       // 1. Draw the original image
@@ -32,7 +37,7 @@ export const addWatermark = (base64Image: string): Promise<string> => {
     };
 
     img.onerror = (error) => {
-      console.error("Failed to load image for watermarking:", error);
+      logger.error("WATERMARK_LOAD_ERROR", "Failed to load image for watermarking.", { error });
       reject(new Error('Image could not be loaded for watermarking.'));
     };
 

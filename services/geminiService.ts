@@ -1,5 +1,7 @@
+
 import { GoogleGenAI, Modality, GenerateContentResponse } from "@google/genai";
 import type { Era, TransformationOptions, Language } from "../types";
+import { logger } from "../utils/logger";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -92,6 +94,7 @@ export async function transformImage(
 ): Promise<string | null> {
   try {
     const prompt = generateTransformationPrompt(era, options, language);
+    logger.info('GEMINI_API_CALL_START', 'Starting image transformation call to Gemini API.', { eraId: era.id, style: options.style });
     
     const imagePart = {
       inlineData: {
@@ -116,18 +119,18 @@ export async function transformImage(
       const parts = response.candidates[0].content.parts;
       for (const part of parts) {
         if (part.inlineData) {
+          logger.info('GEMINI_API_CALL_SUCCESS', 'Received image from Gemini API.');
           return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
         }
       }
     }
-    console.warn("Gemini API response did not contain an image.", response);
+    logger.warn("GEMINI_API_NO_IMAGE", "Gemini API response did not contain an image.", { response });
     return null;
 
   } catch (error) {
-    console.error("Error transforming image with Gemini API:", error);
-    if (error instanceof Error) {
-        throw new Error(`Gemini API Error: ${error.message}`);
-    }
-    throw new Error(`Gemini API Error: ${JSON.stringify(error)}`);
+    logger.error("GEMINI_API_ERROR", "Error transforming image with Gemini API.", { error });
+    // Re-throw the original error to be handled by the caller (App.tsx).
+    // This preserves the original error type and stack trace for better logging.
+    throw error;
   }
 }

@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ImageUploader } from './components/ImageUploader';
@@ -10,6 +11,7 @@ import type { Era, TransformationOptions, Language } from './types';
 import { transformImage } from './services/geminiService';
 import { translations } from './translations';
 import { addWatermark } from './utils/imageUtils';
+import { logger } from './utils/logger';
 
 type AppStep = 'UPLOAD' | 'SELECT_ERA' | 'VIEW_RESULT';
 
@@ -26,6 +28,10 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [remainingTransforms, setRemainingTransforms] = useState(DAILY_TRANSFORMATION_LIMIT);
 
+  useEffect(() => {
+    logger.info('APP_INIT', 'Application initializing.');
+  }, []);
+
   const updateRemainingTransforms = useCallback(() => {
     const today = new Date().toISOString().split('T')[0];
     const usageDataString = localStorage.getItem('timeWarpUsage');
@@ -33,15 +39,18 @@ const App: React.FC = () => {
       try {
         const usageData = JSON.parse(usageDataString);
         if (usageData.date === today) {
-          setRemainingTransforms(Math.max(0, DAILY_TRANSFORMATION_LIMIT - usageData.count));
+          const remaining = Math.max(0, DAILY_TRANSFORMATION_LIMIT - usageData.count);
+          setRemainingTransforms(remaining);
+          logger.info('USAGE_CHECK', `Usage checked for today.`, { remaining });
           return;
         }
       } catch (e) {
-        console.error("Failed to parse usage data:", e);
+        logger.error('USAGE_PARSE_ERROR', 'Failed to parse usage data from localStorage.', { error: e });
         localStorage.removeItem('timeWarpUsage');
       }
     }
     setRemainingTransforms(DAILY_TRANSFORMATION_LIMIT);
+    logger.info('USAGE_RESET', 'Usage data reset or not found for today.', { remaining: DAILY_TRANSFORMATION_LIMIT });
   }, []);
 
   useEffect(() => {
@@ -49,10 +58,12 @@ const App: React.FC = () => {
   }, [updateRemainingTransforms]);
 
   const handleLanguageSelect = (lang: Language) => {
+    logger.info('LANGUAGE_SELECT', `Language selected: ${lang}`);
     setLanguage(lang);
   };
 
   const handleImageUpload = (imageDataUrl: string, mimeType: string) => {
+    logger.info('IMAGE_UPLOAD', 'Image successfully uploaded by user.', { mimeType });
     setOriginalImage(imageDataUrl);
     setOriginalImageMimeType(mimeType);
     setStep('SELECT_ERA');
@@ -61,8 +72,9 @@ const App: React.FC = () => {
 
   const handleEraSelect = useCallback(async (era: Era) => {
     if (!originalImage || !originalImageMimeType || !language) return;
+    logger.info('ERA_SELECTED', 'User selected an era to transform.', { era: era.id });
     
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
     let usageData = { date: '', count: 0 };
     try {
         const usageDataString = localStorage.getItem('timeWarpUsage');
@@ -70,12 +82,14 @@ const App: React.FC = () => {
             usageData = JSON.parse(usageDataString);
         }
     } catch(e) {
-        console.error("Failed to parse usage data, resetting.", e);
+        logger.error('USAGE_PARSE_ERROR_ON_TRANSFORM', 'Failed to parse usage data during transformation.', { error: e });
         localStorage.removeItem('timeWarpUsage');
     }
 
     if (usageData.date === today && usageData.count >= DAILY_TRANSFORMATION_LIMIT) {
-      setError(translations[language].error.limitReached);
+      const limitError = translations[language].error.limitReached;
+      setError(limitError);
+      logger.warn('LIMIT_REACHED', 'User attempted transformation but has reached the daily limit.');
       return;
     }
     
@@ -88,6 +102,7 @@ const App: React.FC = () => {
         const newCount = usageData.date === today ? usageData.count + 1 : 1;
         localStorage.setItem('timeWarpUsage', JSON.stringify({ date: today, count: newCount }));
         setRemainingTransforms(Math.max(0, DAILY_TRANSFORMATION_LIMIT - newCount));
+        logger.info('USAGE_INCREMENTED', 'User transformation count incremented.', { newCount });
         
         const base64Data = originalImage.split(',')[1];
         
@@ -110,6 +125,7 @@ const App: React.FC = () => {
         const successfulResults = results.filter((res): res is string => res !== null);
         
         if (successfulResults.length > 0) {
+          logger.info('TRANSFORMATION_SUCCESS', 'Successfully generated images from Gemini API.', { count: successfulResults.length });
           const watermarkedImages = await Promise.all(
             successfulResults.map(image => addWatermark(image))
           );
@@ -117,17 +133,20 @@ const App: React.FC = () => {
           setStep('VIEW_RESULT');
         } else {
           setError(translations[language].error.noImage);
+           logger.warn('TRANSFORMATION_NO_IMAGE', 'Gemini API returned no valid images.');
         }
     } catch (e) {
       console.error(e);
-      const errorMessage = e instanceof Error ? e.message : translations[language].error.unknown;
-      setError(errorMessage);
+      logger.error('TRANSFORMATION_ERROR', 'An error occurred during the image transformation process.', { error: e });
+      // Display a generic, user-friendly error message, regardless of the underlying technical issue.
+      setError(translations[language].error.unknown);
     } finally {
       setIsLoading(false);
     }
   }, [originalImage, originalImageMimeType, language]);
 
   const handleRestart = () => {
+    logger.info('RESTART_APP', 'User restarted the process.');
     setStep('UPLOAD');
     setOriginalImage(null);
     setOriginalImageMimeType(null);

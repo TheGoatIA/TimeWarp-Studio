@@ -1,7 +1,9 @@
+
 import React, { useState, useCallback, useRef } from 'react';
 import { Icons } from './Icons';
 import type { Language } from '../types';
 import { translations } from '../translations';
+import { logger } from '../utils/logger';
 
 interface ImageUploaderProps {
   onImageUpload: (imageDataUrl: string, mimeType: string) => void;
@@ -19,21 +21,25 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, lan
 
     if (!file.type.startsWith('image/')) {
       setError(t.error.notImage);
+      logger.error('UPLOAD_VALIDATION_ERROR', 'User tried to upload a non-image file.', { fileName: file.name, fileType: file.type });
       return;
     }
     
     if (file.size > 4 * 1024 * 1024) {
       setError(t.error.tooLarge);
+      logger.error('UPLOAD_VALIDATION_ERROR', 'User tried to upload a file that is too large.', { fileName: file.name, fileSize: file.size });
       return;
     }
 
     setError(null);
     const reader = new FileReader();
     reader.onload = () => {
+      logger.info('FILE_READ_SUCCESS', 'Successfully read file for upload.', { fileName: file.name });
       onImageUpload(reader.result as string, file.type);
     };
     reader.onerror = () => {
       setError(t.error.readError);
+      logger.error('FILE_READ_ERROR', 'Failed to read the file using FileReader.', { fileName: file.name });
     };
     reader.readAsDataURL(file);
   }, [onImageUpload, t]);
@@ -52,6 +58,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, lan
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      logger.info('FILE_DROP', 'User dropped a file for upload.');
       handleFileChange(e.dataTransfer.files[0]);
       e.dataTransfer.clearData();
     }
@@ -84,7 +91,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, lan
                 type="file"
                 accept="image/png, image/jpeg, image/webp"
                 className="hidden"
-                onChange={(e) => handleFileChange(e.target.files ? e.target.files[0] : null)}
+                onChange={(e) => {
+                    logger.info('FILE_SELECT', 'User selected a file via button click.');
+                    handleFileChange(e.target.files ? e.target.files[0] : null);
+                }}
             />
           </div>
         </div>
