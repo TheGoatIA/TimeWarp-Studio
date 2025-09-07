@@ -24,6 +24,7 @@ export const translations = {
     eraSelector: {
       title: 'Select Your Destination',
       subtitle: 'Choose an epoch to begin your transformation.',
+      remaining: (count: number) => `You have ${count} transformation${count === 1 ? '' : 's'} left today.`,
     },
     results: {
       title: 'Transformation Complete!',
@@ -52,6 +53,7 @@ export const translations = {
       tryAgain: 'Try Again',
       noImage: 'The transformation returned no valid images. This could be due to safety filters or an issue with the prompt. Please try a different image or era.',
       unknown: 'An unknown error occurred during transformation.',
+      limitReached: 'You have reached the daily limit of 3 transformations. Please come back tomorrow!',
     }
   },
   fr: {
@@ -79,6 +81,7 @@ export const translations = {
     eraSelector: {
       title: 'Choisissez Votre Destination',
       subtitle: 'Choisissez une époque pour commencer votre transformation.',
+      remaining: (count: number) => `Il vous reste ${count} transformation${count === 1 ? '' : 's'} aujourd'hui.`,
     },
     results: {
       title: 'Transformation Terminée !',
@@ -107,6 +110,7 @@ export const translations = {
       tryAgain: 'Réessayer',
       noImage: 'La transformation n\'a retourné aucune image valide. Cela pourrait être dû à des filtres de sécurité ou à un problème avec le prompt. Veuillez essayer une autre image ou une autre époque.',
       unknown: 'Une erreur inconnue est survenue lors de la transformation.',
+      limitReached: 'Vous avez atteint la limite quotidienne de 3 transformations. Veuillez revenir demain !',
     }
   }
 };

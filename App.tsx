@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ImageUploader } from './components/ImageUploader';
 import { EraSelector } from './components/EraSelector';
@@ -9,8 +9,11 @@ import { LanguageSelector } from './components/LanguageSelector';
 import type { Era, TransformationOptions, Language } from './types';
 import { transformImage } from './services/geminiService';
 import { translations } from './translations';
+import { addWatermark } from './utils/imageUtils';
 
 type AppStep = 'UPLOAD' | 'SELECT_ERA' | 'VIEW_RESULT';
+
+const DAILY_TRANSFORMATION_LIMIT = 3;
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language | null>(null);
@@ -21,6 +24,29 @@ const App: React.FC = () => {
   const [selectedEra, setSelectedEra] = useState<Era | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [remainingTransforms, setRemainingTransforms] = useState(DAILY_TRANSFORMATION_LIMIT);
+
+  const updateRemainingTransforms = useCallback(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const usageDataString = localStorage.getItem('timeWarpUsage');
+    if (usageDataString) {
+      try {
+        const usageData = JSON.parse(usageDataString);
+        if (usageData.date === today) {
+          setRemainingTransforms(Math.max(0, DAILY_TRANSFORMATION_LIMIT - usageData.count));
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to parse usage data:", e);
+        localStorage.removeItem('timeWarpUsage');
+      }
+    }
+    setRemainingTransforms(DAILY_TRANSFORMATION_LIMIT);
+  }, []);
+
+  useEffect(() => {
+    updateRemainingTransforms();
+  }, [updateRemainingTransforms]);
 
   const handleLanguageSelect = (lang: Language) => {
     setLanguage(lang);
@@ -30,10 +56,28 @@ const App: React.FC = () => {
     setOriginalImage(imageDataUrl);
     setOriginalImageMimeType(mimeType);
     setStep('SELECT_ERA');
+    updateRemainingTransforms();
   };
 
   const handleEraSelect = useCallback(async (era: Era) => {
     if (!originalImage || !originalImageMimeType || !language) return;
+    
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    let usageData = { date: '', count: 0 };
+    try {
+        const usageDataString = localStorage.getItem('timeWarpUsage');
+        if (usageDataString) {
+            usageData = JSON.parse(usageDataString);
+        }
+    } catch(e) {
+        console.error("Failed to parse usage data, resetting.", e);
+        localStorage.removeItem('timeWarpUsage');
+    }
+
+    if (usageData.date === today && usageData.count >= DAILY_TRANSFORMATION_LIMIT) {
+      setError(translations[language].error.limitReached);
+      return;
+    }
     
     setSelectedEra(era);
     setIsLoading(true);
@@ -41,6 +85,10 @@ const App: React.FC = () => {
     setGeneratedImages([]);
 
     try {
+        const newCount = usageData.date === today ? usageData.count + 1 : 1;
+        localStorage.setItem('timeWarpUsage', JSON.stringify({ date: today, count: newCount }));
+        setRemainingTransforms(Math.max(0, DAILY_TRANSFORMATION_LIMIT - newCount));
+        
         const base64Data = originalImage.split(',')[1];
         
         const variationStyles = era.styles[language].slice(0, 3);
@@ -62,7 +110,10 @@ const App: React.FC = () => {
         const successfulResults = results.filter((res): res is string => res !== null);
         
         if (successfulResults.length > 0) {
-          setGeneratedImages(successfulResults);
+          const watermarkedImages = await Promise.all(
+            successfulResults.map(image => addWatermark(image))
+          );
+          setGeneratedImages(watermarkedImages);
           setStep('VIEW_RESULT');
         } else {
           setError(translations[language].error.noImage);
@@ -116,7 +167,7 @@ const App: React.FC = () => {
           </div>
         );
       case 'SELECT_ERA':
-        return <EraSelector onEraSelect={handleEraSelect} language={language} />;
+        return <EraSelector onEraSelect={handleEraSelect} language={language} remainingTransforms={remainingTransforms} />;
       case 'VIEW_RESULT':
         if (originalImage && generatedImages.length > 0 && selectedEra) {
           return <ResultViewer originalImage={originalImage} generatedImages={generatedImages} era={selectedEra} onRestart={handleRestart} language={language} />;

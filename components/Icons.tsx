@@ -101,10 +101,31 @@ export const Icons = {
         <path d="M12.5 13.5 4 17" />
     </Icon>
   ),
-  OttomanEmpire: (props: React.SVGProps<SVGSVGElement>) => ( // Crescent and Star
+  DynasticChina: (props: React.SVGProps<SVGSVGElement>) => ( // Fan
     <Icon {...props}>
-        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z" clipRule="evenodd"/>
-        <path d="M12 4a8 8 0 1 0 0 16 4 4 0 0 1 0-8 4 4 0 0 1 0-8Z" />
+      <path d="M12 12c-3 0-5.6-1.7-6.8-4H3c-.8.6-1.5 1.4-2 2.3.5.9 1.2 1.7 2 2.3h2.8c1.2-2.3 3.8-4 6.8-4s5.6 1.7 6.8 4H21c.8-.6 1.5-1.4 2-2.3-.5-.9-1.2-1.7-2-2.3h-2.2C17.6 10.3 15 12 12 12z" />
+      <path d="M12 12v9" />
+      <path d="m16.5 13.5-4.5 4.5" />
+      <path d="m7.5 13.5 4.5 4.5" />
+    </Icon>
+  ),
+  FeudalJapan: (props: React.SVGProps<SVGSVGElement>) => ( // Torii Gate
+    <Icon {...props}>
+      <path d="M4 4c0 4 3 8 8 8s8-4 8-8" />
+      <path d="M4 4h16" />
+      <path d="M4 22h16" />
+      <path d="M8 22V4" />
+      <path d="M16 22V4" />
+    </Icon>
+  ),
+  Mesoamerican: (props: React.SVGProps<SVGSVGElement>) => ( // Step Pyramid
+    <Icon {...props}>
+      <path d="M2 22h20" />
+      <path d="M4 18h16" />
+      <path d="M6 14h12" />
+      <path d="M8 10h8" />
+      <path d="M10 6h4" />
+      <path d="M12 2v4" />
     </Icon>
   ),
   Victorian: (props: React.SVGProps<SVGSVGElement>) => ( // Top hat
@@ -114,15 +135,13 @@ export const Icons = {
         <path d="M12 4c1.93 0 3.5 1.57 3.5 3.5V11h-7V7.5C8.5 5.57 10.07 4 12 4z" />
     </Icon>
   ),
-  BelleEpoque: (props: React.SVGProps<SVGSVGElement>) => ( // Eiffel Tower
+  ArtNouveau: (props: React.SVGProps<SVGSVGElement>) => ( // Stylized Plant
     <Icon {...props}>
-        <path d="M4 22h16" />
-        <path d="M12 11c-1-3-2-6-2-8" />
-        <path d="M12 11c1-3 2-6 2-8" />
-        <path d="M12 22V3" />
-        <path d="M10 3h4" />
-        <path d="M5 16.5A13.36 13.36 0 0 1 12 14a13.36 13.36 0 0 1 7 2.5" />
-        <path d="M8 11h8" />
+      <path d="M12 21V8a4 4 0 0 0-4-4H4" />
+      <path d="M12 8a4 4 0 0 1 4-4h4" />
+      <circle cx="4" cy="4" r="2" />
+      <circle cx="20" cy="4" r="2" />
+      <path d="M12 21a4 4 0 0 0 4-4v-1a4 4 0 0 1-8 0v1a4 4 0 0 0 4 4z" />
     </Icon>
   ),
   Twenties: (props: React.SVGProps<SVGSVGElement>) => ( // Martini glass
@@ -132,57 +151,23 @@ export const Icons = {
         <path d="m19 3-7 8-7-8" />
     </Icon>
   ),
-  Sixties: (props: React.SVGProps<SVGSVGElement>) => ( // Peace sign
+  Bauhaus: (props: React.SVGProps<SVGSVGElement>) => ( // Geometric Composition
     <Icon {...props}>
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 12V2" />
-        <path d="M12 12l-6 6" />
-        <path d="M12 12l6 6" />
+      <circle cx="17" cy="17" r="5" />
+      <rect x="2" y="12" width="10" height="10" rx="2" />
+      <path d="M2 8l10-6" />
     </Icon>
   ),
-  Disco: (props: React.SVGProps<SVGSVGElement>) => ( // Disco ball
+  PopArt: (props: React.SVGProps<SVGSVGElement>) => ( // Speech Bubble
     <Icon {...props}>
-        <path d="M12 12c-2 0-4.5 1.5-4.5 1.5s-1.5-2-1.5-4.5 2-4.5 4.5-4.5 4.5 2 4.5 4.5-1.5 4.5-1.5 4.5-2.5-1.5-4.5-1.5z" />
-        <path d="m12 12 1 1" />
-        <path d="m11 13 1 1" />
-        <path d="m13 11 1 1" />
-        <path d="m12 12-1-1" />
-        <path d="m11 11-1-1" />
-        <path d="m13 13 1 1" />
-        <path d="m13 15 1 1" />
-        <path d="m11 15 1 1" />
-        <path d="m15 13 1 1" />
-        <path d="m15 11 1 1" />
-        <path d="m9 13 1 1" />
-        <path d="m9 11 1 1" />
-        <path d="m11 9 1 1" />
-        <path d="m13 9 1 1" />
-        <path d="M12 2a10 10 0 1 0 10 10" />
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </Icon>
   ),
-  Eighties: (props: React.SVGProps<SVGSVGElement>) => ( // Cassette tape
+  The2010s: (props: React.SVGProps<SVGSVGElement>) => ( // Smartphone with heart
     <Icon {...props}>
-        <rect width="20" height="14" x="2" y="5" rx="2" />
-        <path d="M6 15h12" />
-        <circle cx="8.5" cy="10.5" r="1.5" />
-        <circle cx="15.5" cy="10.5" r="1.5" />
-    </Icon>
-  ),
-  Nineties: (props: React.SVGProps<SVGSVGElement>) => ( // CD
-    <Icon {...props}>
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="2" />
-    </Icon>
-  ),
-  TwoThousands: (props: React.SVGProps<SVGSVGElement>) => ( // Flip phone
-    <Icon {...props}>
-        <rect width="14" height="12" x="5" y="10" rx="2" />
-        <path d="M12 12h.01" />
-        <path d="M12 15h.01" />
-        <path d="M10 15h.01" />
-        <path d="M14 15h.01" />
-        <path d="M10 18h4" />
-        <rect width="14" height="8" x="5" y="2" rx="2" />
+      <rect x="6" y="2" width="12" height="20" rx="2" />
+      <path d="M12 18h.01" />
+      <path d="M12 10.4c-1-1-2.5-1-3.5 0s-1 2.5 0 3.5L12 17l3.5-3.1c1-1 1-2.5 0-3.5s-2.5-1-3.5 0z" />
     </Icon>
   ),
 };

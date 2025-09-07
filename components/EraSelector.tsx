@@ -6,13 +6,19 @@ import { translations } from '../translations';
 interface EraSelectorProps {
   onEraSelect: (era: Era) => void;
   language: Language;
+  remainingTransforms: number;
 }
 
-const EraCard: React.FC<{ era: Era; onSelect: () => void; language: Language }> = ({ era, onSelect, language }) => {
+const EraCard: React.FC<{ era: Era; onSelect: () => void; language: Language, disabled: boolean }> = ({ era, onSelect, language, disabled }) => {
   return (
     <div
-      className={`group relative overflow-hidden rounded-lg border-2 bg-gray-900 shadow-lg transition-all duration-300 hover:shadow-amber-500/30 hover:scale-105 cursor-pointer ${era.color}`}
-      onClick={onSelect}
+      className={`group relative overflow-hidden rounded-lg border-2 bg-gray-900 shadow-lg transition-all duration-300 ${
+        disabled 
+          ? 'cursor-not-allowed opacity-50' 
+          : 'hover:shadow-amber-500/30 hover:scale-105 cursor-pointer'
+      } ${era.color}`}
+      onClick={!disabled ? onSelect : undefined}
+      aria-disabled={disabled}
     >
       <img src={era.image} alt={era.name[language]} className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity duration-300" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
@@ -26,15 +32,24 @@ const EraCard: React.FC<{ era: Era; onSelect: () => void; language: Language }> 
   );
 };
 
-export const EraSelector: React.FC<EraSelectorProps> = ({ onEraSelect, language }) => {
+export const EraSelector: React.FC<EraSelectorProps> = ({ onEraSelect, language, remainingTransforms }) => {
     const t = translations[language].eraSelector;
+    const hasTransformsLeft = remainingTransforms > 0;
+
   return (
     <div className="w-full animate-fade-in">
       <h2 className="text-4xl font-cinzel text-center mb-2">{t.title}</h2>
-      <p className="text-lg text-gray-400 text-center mb-10">{t.subtitle}</p>
+      <p className="text-lg text-gray-400 text-center mb-2">{t.subtitle}</p>
+      <p className="text-md text-amber-300 text-center mb-10">{t.remaining(remainingTransforms)}</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {HISTORICAL_ERAS.map((era) => (
-          <EraCard key={era.id} era={era} onSelect={() => onEraSelect(era)} language={language} />
+          <EraCard 
+            key={era.id} 
+            era={era} 
+            onSelect={() => onEraSelect(era)} 
+            language={language}
+            disabled={!hasTransformsLeft}
+          />
         ))}
       </div>
     </div>
