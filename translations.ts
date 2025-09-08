@@ -70,13 +70,6 @@ export const translations = {
         button: "Apply",
         error: "Magic Edit failed. Please try a different prompt.",
       },
-      livingPortrait: {
-        button: "Create Living Portrait",
-        animate: "Animate",
-        comingSoon: "Coming soon!",
-        title: "Your Living Portrait is Ready!",
-        error: "Failed to create animation. The digital spirits are resting.",
-      }
     },
     error: {
       title: 'Transformation Failed',
@@ -157,13 +150,6 @@ export const translations = {
         button: "Appliquer",
         error: "La modification magique a échoué. Veuillez essayer une autre instruction.",
       },
-      livingPortrait: {
-        button: "Créer un Portrait Vivant",
-        animate: "Animer",
-        comingSoon: "Bientôt disponible !",
-        title: "Votre Portrait Vivant est Prêt !",
-        error: "La création de l'animation a échoué. Les esprits numériques se reposent.",
-      }
     },
     error: {
       title: 'La Transformation a Échoué',
