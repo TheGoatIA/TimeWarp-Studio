@@ -105,11 +105,6 @@ const App: React.FC = () => {
     setGeneratedImages([]);
 
     try {
-        const newCount = usageData.date === today ? usageData.count + 1 : 1;
-        localStorage.setItem('timeWarpUsage', JSON.stringify({ date: today, count: newCount }));
-        setRemainingTransforms(Math.max(0, DAILY_TRANSFORMATION_LIMIT - newCount));
-        logger.info('USAGE_INCREMENTED', 'User transformation count incremented.', { newCount, sessionId });
-        
         const variationStyles = era.styles[language].slice(0, 1);
         if (variationStyles.length === 0) {
           variationStyles.push('Default Style');
@@ -123,7 +118,6 @@ const App: React.FC = () => {
                 filter: 'Era-appropriate photographic style',
                 artisticStyle: artisticStyle
             };
-            // FIX: Pass the full originalImage data URL. The service expects to split it.
             return transformImage(originalImage, originalImageMimeType, era, options, language, sessionId);
         });
 
@@ -131,6 +125,12 @@ const App: React.FC = () => {
         const successfulResults = results.filter((res): res is string => res !== null);
         
         if (successfulResults.length > 0) {
+          // --- SUCCESS: Decrement usage count only on successful generation ---
+          const newCount = usageData.date === today ? usageData.count + 1 : 1;
+          localStorage.setItem('timeWarpUsage', JSON.stringify({ date: today, count: newCount }));
+          setRemainingTransforms(Math.max(0, DAILY_TRANSFORMATION_LIMIT - newCount));
+          logger.info('USAGE_INCREMENTED', 'User transformation count incremented upon success.', { newCount, sessionId });
+
           logger.info('TRANSFORMATION_SUCCESS', 'Successfully generated images from Gemini API.', { count: successfulResults.length, sessionId });
           trackEvent('transformation_success', { category: 'Transformation', label: era.id, value: successfulResults.length });
           
@@ -149,7 +149,6 @@ const App: React.FC = () => {
       console.error(e);
       logger.error('TRANSFORMATION_ERROR', 'An error occurred during the image transformation process.', { error: e, sessionId });
       trackEvent('transformation_error', { category: 'Error', label: (e instanceof Error ? e.message : 'unknown') });
-      // Display a generic, user-friendly error message, regardless of the underlying technical issue.
       setError(translations[language].error.unknown);
     } finally {
       setIsLoading(false);
