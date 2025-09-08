@@ -72,6 +72,8 @@ export const translations = {
       },
       livingPortrait: {
         button: "Create Living Portrait",
+        animate: "Animate",
+        comingSoon: "Coming soon!",
         title: "Your Living Portrait is Ready!",
         error: "Failed to create animation. The digital spirits are resting.",
       }
@@ -81,7 +83,7 @@ export const translations = {
       tryAgain: 'Try Again',
       noImage: 'The transformation returned no valid images. This could be due to safety filters or an issue with the prompt. Please try a different image or era.',
       unknown: 'An unknown error occurred during transformation.',
-      limitReached: 'You have reached the daily limit of 3 transformations. Please come back tomorrow!',
+      limitReached: 'You have reached the daily limit of 2 transformations. Please come back tomorrow!',
     }
   },
   fr: {
@@ -157,6 +159,8 @@ export const translations = {
       },
       livingPortrait: {
         button: "Créer un Portrait Vivant",
+        animate: "Animer",
+        comingSoon: "Bientôt disponible !",
         title: "Votre Portrait Vivant est Prêt !",
         error: "La création de l'animation a échoué. Les esprits numériques se reposent.",
       }
@@ -166,7 +170,7 @@ export const translations = {
       tryAgain: 'Réessayer',
       noImage: 'La transformation n\'a retourné aucune image valide. Cela pourrait être dû à des filtres de sécurité ou à un problème avec le prompt. Veuillez essayer une autre image ou une autre époque.',
       unknown: 'Une erreur inconnue est survenue lors de la transformation.',
-      limitReached: 'Vous avez atteint la limite quotidienne de 3 transformations. Veuillez revenir demain !',
+      limitReached: 'Vous avez atteint la limite quotidienne de 2 transformations. Veuillez revenir demain !',
     }
   }
 };

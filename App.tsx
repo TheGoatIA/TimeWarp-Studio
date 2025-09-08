@@ -15,7 +15,7 @@ import { trackEvent } from './services/analyticsService';
 
 type AppStep = 'UPLOAD' | 'SELECT_ERA' | 'VIEW_RESULT';
 
-const DAILY_TRANSFORMATION_LIMIT = 3; // Increased limit for new features
+const DAILY_TRANSFORMATION_LIMIT = 2;
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language | null>(null);
@@ -110,7 +110,7 @@ const App: React.FC = () => {
         setRemainingTransforms(Math.max(0, DAILY_TRANSFORMATION_LIMIT - newCount));
         logger.info('USAGE_INCREMENTED', 'User transformation count incremented.', { newCount, sessionId });
         
-        const variationStyles = era.styles[language].slice(0, 3);
+        const variationStyles = era.styles[language].slice(0, 1);
         if (variationStyles.length === 0) {
           variationStyles.push('Default Style');
         }

@@ -4,7 +4,7 @@ import { Icons } from './Icons';
 import { translations } from '../translations';
 import { logger } from '../utils/logger';
 import { editImage, animateImage } from '../services/geminiService';
-import { VideoLoadingIndicator } from './VideoLoadingIndicator';
+// import { VideoLoadingIndicator } from './VideoLoadingIndicator';
 import { addWatermark } from '../utils/imageUtils';
 import { trackEvent } from '../services/analyticsService';
 
@@ -40,14 +40,15 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
   const [editPrompt, setEditPrompt] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [animationError, setAnimationError] = useState<string | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  // const [isAnimating, setIsAnimating] = useState(false);
+  // const [animationError, setAnimationError] = useState<string | null>(null);
+  // const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const activeGeneratedImage = editedImages[activeImageIndex] || generatedImages[activeImageIndex];
   const activeRawImage = rawEditedImages[activeImageIndex] || rawGeneratedImages[activeImageIndex];
   const t = translations[language].results;
 
+  /*
   useEffect(() => {
     return () => {
       if (videoUrl) {
@@ -56,6 +57,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
       }
     };
   }, [videoUrl]);
+  */
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!isDragging || !containerRef.current) return;
@@ -122,6 +124,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
       }
   };
 
+  /*
   const handleAnimate = async () => {
       setIsAnimating(true);
       setAnimationError(null);
@@ -145,6 +148,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
           setIsAnimating(false);
       }
   };
+  */
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col items-center animate-fade-in" onMouseUp={handleMouseUp} onTouchEnd={handleMouseUp}>
@@ -223,21 +227,21 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
         {/* Living Portrait */}
         <div className="bg-gray-900/50 p-6 rounded-lg border border-cyan-500/30 flex flex-col justify-center items-center">
             <h3 className="text-xl font-cinzel text-cyan-300 mb-4 flex items-center"><Icons.Video className="w-5 h-5 mr-2" /> {t.livingPortrait.button}</h3>
-            <button onClick={handleAnimate} disabled={isAnimating || !!videoUrl} className="bg-cyan-600 text-white font-bold py-2 px-6 rounded-full hover:bg-cyan-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              {isAnimating ? "Creating..." : (videoUrl ? "Created!" : "Animate")}
+            <button disabled className="bg-cyan-600 text-white font-bold py-2 px-6 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              {t.livingPortrait.animate}
             </button>
-            {animationError && <p className="text-red-400 text-sm mt-2">{animationError}</p>}
+            <p className="text-cyan-200 text-sm mt-2">{t.livingPortrait.comingSoon}</p>
         </div>
       </div>
 
-      {isAnimating && <VideoLoadingIndicator language={language} />}
+      {/* {isAnimating && <VideoLoadingIndicator language={language} />} */}
 
-      {videoUrl && (
+      {/* {videoUrl && (
           <div className="w-full max-w-4xl my-6 animate-fade-in">
               <h3 className="text-2xl font-cinzel text-center text-amber-300 mb-4">{t.livingPortrait.title}</h3>
               <video src={videoUrl} controls autoPlay loop className="w-full max-w-md mx-auto rounded-lg border-2 border-amber-500/50" />
           </div>
-      )}
+      )} */}
 
       <div className="w-full max-w-4xl bg-gray-900/50 p-6 rounded-lg border border-amber-500/30 mt-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">

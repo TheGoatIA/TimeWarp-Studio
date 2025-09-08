@@ -40,7 +40,36 @@ const extractImageFromResponse = (response: GenerateContentResponse): string | n
 };
 
 /**
+ * Internal helper to perform a single image generation call to the Gemini API.
+ */
+const generateEraImage = async (
+    base64Image: string,
+    mimeType: string,
+    prompt: string
+): Promise<string | null> => {
+    const imagePart = {
+        inlineData: {
+            data: base64Image,
+            mimeType: mimeType,
+        },
+    };
+    const textPart = { text: prompt };
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image-preview',
+        contents: { parts: [imagePart, textPart] },
+        config: {
+            responseModalities: [Modality.IMAGE, Modality.TEXT],
+        },
+    });
+
+    return extractImageFromResponse(response);
+};
+
+
+/**
  * Transforms an image into a new style based on a historical/fantasy era.
+ * Includes an intelligent retry mechanism to improve reliability.
  * @param originalImage The base64 data URL of the source image.
  * @param originalImageMimeType The MIME type of the source image.
  * @param era The selected era for transformation.
@@ -58,37 +87,43 @@ export const transformImage = async (
     sessionId: string
 ): Promise<string | null> => {
     try {
-        const prompt = `Transform the person in the provided image to fit the ${era.name[language]} era (${era.period[language]}). The style should be: ${options.style}. The overall artistic style is: ${options.artisticStyle}. The environment should be an ${options.environment}. The final image should look like an ${options.filter}. Description of the era for context: ${era.description[language]}. Ensure the person's face is clearly visible and recognizable. The output must be only the image, with no text or borders.`;
+        const base64Data = getBase64(originalImage);
+        const allStyles = era.styles[language];
+        const primaryStyle = options.style;
 
-        const imagePart = {
-            inlineData: {
-                data: getBase64(originalImage),
-                mimeType: originalImageMimeType,
-            },
+        const buildPrompt = (style: string): string => {
+            return `Transform the person in the provided image to fit the ${era.name[language]} era (${era.period[language]}). Style: ${style}. Artistic style: ${options.artisticStyle}. Environment: ${options.environment}. Photographic filter: ${options.filter}. Context: ${era.description[language]}. Ensure the person's face is clearly visible and recognizable. The output must be only the image, with no text or borders.`;
         };
 
-        const textPart = { text: prompt };
-
-        // FIX: Use gemini-2.5-flash-image-preview for image editing/transformation as per guidelines.
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image-preview',
-            contents: { parts: [imagePart, textPart] },
-            config: {
-                // Per guidelines, must include both Modality.IMAGE and Modality.TEXT
-                responseModalities: [Modality.IMAGE, Modality.TEXT],
-            },
-        });
+        // --- First Attempt ---
+        const primaryPrompt = buildPrompt(primaryStyle);
+        let imageUrl = await generateEraImage(base64Data, originalImageMimeType, primaryPrompt);
         
-        const imageUrl = extractImageFromResponse(response);
         if (imageUrl) {
-            logger.info('GEMINI_TRANSFORM_SUCCESS', 'Image transformed successfully.', { era: era.id, sessionId });
+            logger.info('GEMINI_TRANSFORM_SUCCESS', 'Image transformed successfully on first attempt.', { era: era.id, style: primaryStyle, sessionId });
             return imageUrl;
-        } else {
-            logger.warn('GEMINI_TRANSFORM_NO_IMAGE', 'Gemini response did not contain an image.', { era: era.id, response, sessionId });
-            return null;
         }
+
+        // --- Retry Logic ---
+        logger.warn('GEMINI_TRANSFORM_NO_IMAGE_RETRY', 'First attempt returned no image. Retrying with a fallback style.', { era: era.id, style: primaryStyle, sessionId });
+
+        // Find a different style to use for the retry attempt.
+        const fallbackStyle = allStyles.find(s => s !== primaryStyle) || 'a different artistic interpretation';
+        
+        const fallbackPrompt = buildPrompt(fallbackStyle);
+        imageUrl = await generateEraImage(base64Data, originalImageMimeType, fallbackPrompt);
+
+        if (imageUrl) {
+            logger.info('GEMINI_TRANSFORM_SUCCESS_RETRY', 'Image transformed successfully on retry.', { era: era.id, style: fallbackStyle, sessionId });
+            return imageUrl;
+        }
+        
+        // If both attempts fail, log it and return null.
+        logger.warn('GEMINI_TRANSFORM_NO_IMAGE_FINAL', 'All transformation attempts failed to return an image.', { era: era.id, sessionId });
+        return null;
+
     } catch (error) {
-        logger.error('GEMINI_TRANSFORM_ERROR', 'Error calling Gemini API for transformImage.', { error, sessionId });
+        logger.error('GEMINI_TRANSFORM_ERROR', 'An unrecoverable error occurred during the image transformation process.', { error, sessionId });
         console.error('Gemini transformImage error:', error);
         return null;
     }
