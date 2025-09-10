@@ -18,7 +18,9 @@ export const Header: React.FC<HeaderProps> = ({ language }) => {
             TimeWarp <span className="text-amber-400">Studio</span>
           </h1>
         </div>
-        <p className="hidden md:block text-sm text-gray-400 italic">{t.tagline}</p>
+        <div className="flex items-center space-x-6">
+          <p className="hidden lg:block text-sm text-gray-400 italic">{t.tagline}</p>
+        </div>
       </div>
     </header>
   );

@@ -30,7 +30,6 @@ export const ERAS: Era[] = [
       en: ['Animal hides and furs', 'Simple leather loincloths and tunics', 'Jewelry made from shells, bones, and teeth'],
       fr: ['Peaux d\'animaux et fourrures', 'Simples pagnes et tuniques en cuir', 'Bijoux faits de coquillages, d\'os et de dents'],
     },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/10/25/audio_553250b33b.mp3',
     category: { en: 'Historical Eras', fr: 'Époques Historiques' },
   },
   {
@@ -60,7 +59,6 @@ export const ERAS: Era[] = [
       en: ['White linen kilts (schenti) for men', 'Simple sheath dresses (kalasiris) for women', 'Elaborate wigs, headdresses, and heavy kohl eyeliner'],
       fr: ['Kilts en lin blanc (schenti) pour les hommes', 'Robes fourreaux simples (kalasiris) pour les femmes', 'Perruques élaborées, coiffes et eye-liner khôl épais'],
     },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/09/20/audio_03d2836217.mp3',
     category: { en: 'Historical Eras', fr: 'Époques Historiques' },
   },
   {
@@ -90,7 +88,6 @@ export const ERAS: Era[] = [
       en: ['Simple tunics (chiton) and draped cloaks (himation) for Greeks', 'The iconic toga for Roman citizens', 'Leather sandals (caligae) for soldiers'],
       fr: ['Tuniques simples (chiton) et manteaux drapés (himation) pour les Grecs', 'L\'emblématique toge pour les citoyens romains', 'Sandales en cuir (caligae) pour les soldats'],
     },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2024/05/10/audio_2e8f1a1467.mp3',
     category: { en: 'Historical Eras', fr: 'Époques Historiques' },
   },
   {
@@ -120,7 +117,6 @@ export const ERAS: Era[] = [
       en: ['Chainmail and plate armor for knights', 'Linen tunics and woolen cloaks for commoners', 'Pointed shoes (poulaines) and elaborate headdresses (hennins) for nobility'],
       fr: ['Cotte de mailles et armure de plaques pour les chevaliers', 'Tuniques en lin et manteaux en laine pour les roturiers', 'Chaussures pointues (poulaines) et coiffes élaborées (hennins) pour la noblesse'],
     },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/02/01/audio_eb3661643c.mp3',
     category: { en: 'Historical Eras', fr: 'Époques Historiques' },
   },
   {
@@ -150,7 +146,6 @@ export const ERAS: Era[] = [
       en: ['Luxurious fabrics like velvet and silk', 'Voluminous sleeves, ruffs, and doublets for men', 'Corsets, farthingales, and elaborate gowns for women'],
       fr: ['Tissus luxueux comme le velours et la soie', 'Manches volumineuses, fraises et pourpoints pour les hommes', 'Corsets, vertugadins et robes élaborées pour les femmes'],
     },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/08/23/audio_4043f11463.mp3',
     category: { en: 'Historical Eras', fr: 'Époques Historiques' },
   },
   {
@@ -165,7 +160,6 @@ export const ERAS: Era[] = [
     keyEvents: { en: ['Establishment of the Tokugawa Shogunate', 'Period of national isolation (sakoku)', 'Flourishing of Kabuki theater and Sumo wrestling'], fr: ['Établissement du shogunat Tokugawa', 'Période d\'isolement national (sakoku)', 'Floraison du théâtre Kabuki et de la lutte Sumo'] },
     culturalFacts: { en: ['The samurai followed a strict code of conduct called Bushido', 'Ukiyo-e, or "pictures of the floating world," became a major art form', 'Haiku poetry was perfected by masters like Bashō'], fr: ['Les samouraïs suivaient un code de conduite strict appelé Bushido', 'L\'Ukiyo-e, ou "images du monde flottant", est devenu une forme d\'art majeure', 'La poésie Haïku a été perfectionnée par des maîtres comme Bashō'] },
     clothingStyles: { en: ['Layered kimonos with intricate patterns', 'Samurai armor (yoroi) and helmets (kabuto)', 'Traditional geta sandals and tabi socks'], fr: ['Kimonos superposés aux motifs complexes', 'Armures de samouraï (yoroi) et casques (kabuto)', 'Sandales traditionnelles geta et chaussettes tabi'] },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2023/07/22/audio_eb7e1ff76c.mp3',
     category: { en: 'Historical Eras', fr: 'Époques Historiques' },
   },
   {
@@ -195,7 +189,6 @@ export const ERAS: Era[] = [
       en: ['Corsets, bustles, and large crinoline skirts for women', 'Top hats, frock coats, and waistcoats for men', 'Mourning clothes were worn for extended periods'],
       fr: ['Corsets, tournures et grandes jupes à crinoline pour les femmes', 'Chapeaux haut-de-forme, redingotes et gilets pour les hommes', 'Les vêtements de deuil étaient portés pendant de longues périodes'],
     },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2023/10/24/audio_32c021a8d0.mp3',
     category: { en: 'Historical Eras', fr: 'Époques Historiques' },
   },
   {
@@ -225,7 +218,6 @@ export const ERAS: Era[] = [
       en: ['Drop-waist dresses with beading and fringe', 'Cloche hats and long pearl necklaces', 'Sharp suits and fedoras for men'],
       fr: ['Robes à taille basse avec perles et franges', 'Chapeaux cloches et longs colliers de perles', 'Costumes élégants et fedoras pour les hommes'],
     },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/01/24/audio_b72b3c2cb7.mp3',
     category: { en: 'Historical Eras', fr: 'Époques Historiques' },
   },
   {
@@ -240,7 +232,6 @@ export const ERAS: Era[] = [
     keyEvents: { en: ['Andy Warhol exhibits his Campbell\'s Soup Cans', 'The Independent Group forms in London, a precursor to Pop Art', 'Roy Lichtenstein creates his first comic strip-inspired paintings'], fr: ['Andy Warhol expose ses Campbell\'s Soup Cans', 'L\'Independent Group se forme à Londres, précurseur du Pop Art', 'Roy Lichtenstein crée ses premières peintures inspirées des bandes dessinées'] },
     culturalFacts: { en: ['Pop Art is widely interpreted as a reaction to the then-dominant ideas of abstract expressionism', 'It used techniques of mass production like screenprinting', 'Artists sought to blur the lines between "high" art and "low" culture'], fr: ['Le Pop Art est largement interprété comme une réaction aux idées alors dominantes de l\'expressionnisme abstrait', 'Il utilisait des techniques de production de masse comme la sérigraphie', 'Les artistes cherchaient à brouiller les frontières entre l\'art "noble" et la culture "populaire"'] },
     clothingStyles: { en: ['Bold patterns, bright colors, and geometric shapes', 'Mini skirts and vinyl dresses', 'Graphic t-shirts and casual wear reflecting consumer culture'], fr: ['Motifs audacieux, couleurs vives et formes géométriques', 'Minijupes et robes en vinyle', 'T-shirts graphiques et vêtements décontractés reflétant la culture de consommation'] },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/03/24/audio_34b7f6dd29.mp3',
     category: { en: 'Historical Eras', fr: 'Époques Historiques' },
   },
 
@@ -257,7 +248,6 @@ export const ERAS: Era[] = [
     keyEvents: { en: ['The Great Convergence of Magical Races', 'The Forging of the Sunstone', 'The Whispering Woods Pact'], fr: ['La Grande Convergence des Races Magiques', 'La Forge de la Pierre de Soleil', 'Le Pacte des Bois Murmurants'] },
     culturalFacts: { en: ['Elves are known for their archery and connection to nature', 'Dwarves are master blacksmiths and jewelers', 'Fairies communicate through light and song'], fr: ['Les elfes sont connus pour leur tir à l\'arc et leur lien avec la nature', 'Les nains sont des maîtres forgerons et joailliers', 'Les fées communiquent par la lumière et le chant'] },
     clothingStyles: { en: ['Flowing robes with leaf motifs for elves', 'Heavy-duty leather and mail for dwarves', 'Dresses made of petals and moonlight for fairies'], fr: ['Robes fluides avec des motifs de feuilles pour les elfes', 'Cuir et cotte de mailles robustes pour les nains', 'Robes faites de pétales et de clair de lune pour les fées'] },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/11/18/audio_242a321941.mp3',
     category: { en: 'Fantasy', fr: 'Fantasy' },
   },
 
@@ -274,7 +264,6 @@ export const ERAS: Era[] = [
     keyEvents: { en: ['The Fourth Corporate War', 'The rise of Arasaka and Militech', 'The invention of the cyberdeck'], fr: ['La Quatrième Guerre des Corporations', 'L\'ascension d\'Arasaka et Militech', 'L\'invention du cyberdeck'] },
     culturalFacts: { en: ['Body modification with cybernetics is commonplace', 'Mega-corporations control society', 'The Net is a vast, dangerous digital frontier'], fr: ['La modification corporelle avec la cybernétique est monnaie courante', 'Les méga-corporations contrôlent la société', 'Le Net est une frontière numérique vaste et dangereuse'] },
     clothingStyles: { en: ['High-tech gear with integrated LEDs', 'Asymmetrical leather jackets and trench coats', 'Functional, tactical clothing with lots of pockets'], fr: ['Équipement high-tech avec LED intégrées', 'Vestes en cuir et trench-coats asymétriques', 'Vêtements fonctionnels et tactiques avec de nombreuses poches'] },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2023/12/26/audio_f530932822.mp3',
     category: { en: 'Futuristic & Sci-Fi', fr: 'Futuriste & Science-Fiction' },
   },
   {
@@ -289,7 +278,6 @@ export const ERAS: Era[] = [
     keyEvents: { en: ['First contact with the Centaurian civilization', 'The terraforming of Mars is completed', 'Discovery of faster-than-light travel'], fr: ['Premier contact avec la civilisation centaurienne', 'La terraformation de Mars est achevée', 'Découverte du voyage supraluminique'] },
     culturalFacts: { en: ['The United Federation of Planets promotes peace and exploration', 'Zero-gravity sports are the most popular form of entertainment', 'Genetic engineering has eradicated most diseases'], fr: ['La Fédération des Planètes Unies promeut la paix et l\'exploration', 'Les sports en apesanteur sont la forme de divertissement la plus populaire', 'L\'ingénierie génétique a éradiqué la plupart des maladies'] },
     clothingStyles: { en: ['Sleek, form-fitting jumpsuits with insignia', 'Environmentally-sealed exosuits for hazardous planets', 'Practical, utility-focused clothing with advanced materials'], fr: ['Combinaisons élégantes et moulantes avec insignes', 'Exo-combinaisons scellées pour les planètes dangereuses', 'Vêtements pratiques et utilitaires avec des matériaux avancés'] },
-    ambianceSfx: 'https://cdn.pixabay.com/audio/2022/08/03/audio_51f4dc8c48.mp3',
     category: { en: 'Futuristic & Sci-Fi', fr: 'Futuriste & Science-Fiction' },
   },
 ];

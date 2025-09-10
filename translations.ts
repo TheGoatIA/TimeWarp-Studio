@@ -27,6 +27,7 @@ export const translations = {
       subtitle: 'Choose a universe to begin your transformation.',
       remaining: (count: number) => `You have ${count} transformation${count === 1 ? '' : 's'} left today.`,
       dailyChallenge: "Today's Challenge!",
+      surpriseMe: 'Surprise Me!',
       styleModal: {
         title: "Choose Your Style",
         subtitle: "Refine the artistic direction of your transformation.",
@@ -58,8 +59,6 @@ export const translations = {
       shareErrorBrowser: 'Your browser cannot share files.',
       shareErrorGeneral: 'An error occurred while trying to share the image.',
       contextTitle: 'Era Context',
-      ambianceTitle: 'Era Ambiance',
-      ambianceSubtitle: (eraName: string) => `Sounds of ${eraName}`,
       keyEvents: 'Key Events',
       culturalFacts: 'Cultural Facts',
       clothingStyles: 'Clothing Styles',
@@ -69,6 +68,13 @@ export const translations = {
         prompt: "e.g., 'add a pirate hat', 'change hair to blue'...",
         button: "Apply",
         error: "Magic Edit failed. Please try a different prompt.",
+        suggestionsLabel: "Try:",
+      },
+      story: {
+        title: "My Story",
+        button: "📜 Reveal My Story",
+        loading: "Writing your epic tale...",
+        error: "The storyteller is busy crafting other tales. Please try again in a moment.",
       },
     },
     error: {
@@ -77,7 +83,18 @@ export const translations = {
       noImage: 'The transformation returned no valid images. This could be due to safety filters or an issue with the prompt. Please try a different image or era.',
       unknown: 'An unknown error occurred during transformation.',
       limitReached: 'You have reached the daily limit of 2 transformations. Please come back tomorrow!',
-    }
+    },
+    // FIX: Add timeline translations to resolve error in components/Timeline.tsx.
+    timeline: {
+        title: 'Your Timeline',
+        subtitle: 'A gallery of your past journeys through time.',
+        savedOn: 'Saved on',
+        download: 'Download',
+        delete: 'Delete',
+        deleteConfirm: 'Are you sure you want to permanently delete this memory?',
+        empty: 'Your timeline is empty. Create a new transformation to begin your collection!',
+        back: 'Back to Creation',
+    },
   },
   fr: {
     header: {
@@ -107,6 +124,7 @@ export const translations = {
       subtitle: 'Choisissez un univers pour commencer votre transformation.',
       remaining: (count: number) => `Il vous reste ${count} transformation${count === 1 ? '' : 's'} aujourd'hui.`,
       dailyChallenge: "Défi du Jour !",
+      surpriseMe: 'Surprenez-moi !',
        styleModal: {
         title: "Choisissez Votre Style",
         subtitle: "Affinez la direction artistique de votre transformation.",
@@ -138,10 +156,9 @@ export const translations = {
       shareErrorBrowser: 'Votre navigateur ne peut pas partager de fichiers.',
       shareErrorGeneral: 'Une erreur est survenue lors du partage de l\'image.',
       contextTitle: 'Contexte de l\'Époque',
-      ambianceTitle: 'Ambiance d\'Époque',
-      ambianceSubtitle: (eraName: string) => `Sons de l'époque ${eraName}`,
       keyEvents: 'Événements Clés',
       culturalFacts: 'Faits Culturels',
+      // FIX: Renamed 'stylesVestimentaires' to 'clothingStyles' to match the key used in the component and English translations.
       clothingStyles: 'Styles Vestimentaires',
       restart: 'Voyager vers une Nouvelle Époque',
       magicEdit: {
@@ -149,6 +166,13 @@ export const translations = {
         prompt: "ex: 'ajoute un chapeau de pirate', 'cheveux bleus'...",
         button: "Appliquer",
         error: "La modification magique a échoué. Veuillez essayer une autre instruction.",
+        suggestionsLabel: "Essayez :",
+      },
+      story: {
+          title: "Mon Histoire",
+          button: "📜 Révéler Mon Histoire",
+          loading: "Écriture de votre récit épique...",
+          error: "Le conteur est occupé à forger d'autres récits. Veuillez réessayer dans un instant.",
       },
     },
     error: {
@@ -157,6 +181,17 @@ export const translations = {
       noImage: 'La transformation n\'a retourné aucune image valide. Cela pourrait être dû à des filtres de sécurité ou à un problème avec le prompt. Veuillez essayer une autre image ou une autre époque.',
       unknown: 'Une erreur inconnue est survenue lors de la transformation.',
       limitReached: 'Vous avez atteint la limite quotidienne de 2 transformations. Veuillez revenir demain !',
-    }
+    },
+    // FIX: Add timeline translations to resolve error in components/Timeline.tsx.
+    timeline: {
+        title: 'Votre Chronologie',
+        subtitle: 'Une galerie de vos voyages passés à travers le temps.',
+        savedOn: 'Enregistré le',
+        download: 'Télécharger',
+        delete: 'Supprimer',
+        deleteConfirm: 'Êtes-vous sûr de vouloir supprimer définitivement ce souvenir ?',
+        empty: 'Votre chronologie est vide. Créez une nouvelle transformation pour commencer votre collection !',
+        back: 'Retour à la Création',
+    },
   }
 };

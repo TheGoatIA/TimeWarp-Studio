@@ -166,7 +166,7 @@ const App: React.FC = () => {
     setSelectedEra(null);
     setError(null);
   };
-  
+
   const renderContent = () => {
     if (!language) {
       return <LanguageSelector onSelectLanguage={handleLanguageSelect} />;

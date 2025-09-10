@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { ERAS } from '../constants';
 import type { Era, Language } from '../types';
 import { translations } from '../translations';
+import { Icons } from './Icons';
 
 interface EraSelectorProps {
   onEraSelect: (era: Era, artisticStyle: string) => void;
@@ -118,11 +119,31 @@ export const EraSelector: React.FC<EraSelectorProps> = ({ onEraSelect, language,
         }
     };
 
+    const handleSurpriseMe = () => {
+        if (!hasTransformsLeft) return;
+        const randomEra = ERAS[Math.floor(Math.random() * ERAS.length)];
+        const randomStyle = STYLE_MODIFIERS[Math.floor(Math.random() * STYLE_MODIFIERS.length)];
+        onEraSelect(randomEra, randomStyle);
+    };
+
   return (
     <div className="w-full animate-fade-in">
       <h2 className="text-4xl font-cinzel text-center mb-2">{t.title}</h2>
       <p className="text-lg text-gray-400 text-center mb-2">{t.subtitle}</p>
-      <p className="text-md text-amber-300 text-center mb-10">{t.remaining(remainingTransforms)}</p>
+      <p className="text-md text-amber-300 text-center mb-6">{t.remaining(remainingTransforms)}</p>
+
+      <div className="flex justify-center mb-10">
+        <button
+          onClick={handleSurpriseMe}
+          disabled={!hasTransformsLeft}
+          className="bg-gradient-to-r from-purple-600 to-amber-500 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-amber-400/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+        >
+          <div className="flex items-center space-x-2">
+            <Icons.Sparkles className="w-5 h-5" />
+            <span>{t.surpriseMe}</span>
+          </div>
+        </button>
+      </div>
       
       {Object.entries(erasByCategory).map(([category, eras]) => (
         <div key={category} className="mb-12">

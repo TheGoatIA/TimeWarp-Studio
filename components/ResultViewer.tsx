@@ -3,7 +3,7 @@ import type { Era, Language } from '../types';
 import { Icons } from './Icons';
 import { translations } from '../translations';
 import { logger } from '../utils/logger';
-import { editImage } from '../services/geminiService';
+import { editImage, generateStory, getMagicEditSuggestions } from '../services/geminiService';
 import { addWatermark } from '../utils/imageUtils';
 import { trackEvent } from '../services/analyticsService';
 
@@ -40,9 +40,46 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
   const [isEditing, setIsEditing] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
+  // State for the story feature
+  const [storyCache, setStoryCache] = useState<Record<number, string>>({});
+  const [isStoryLoading, setIsStoryLoading] = useState(false);
+  const [storyError, setStoryError] = useState<string | null>(null);
+  
+  // State for Magic Edit suggestions
+  const [magicSuggestions, setMagicSuggestions] = useState<string[]>([]);
+  const [areSuggestionsLoading, setAreSuggestionsLoading] = useState(false);
+  
   const activeGeneratedImage = editedImages[activeImageIndex] || generatedImages[activeImageIndex];
   const activeRawImage = rawEditedImages[activeImageIndex] || rawGeneratedImages[activeImageIndex];
+  const activeStory = storyCache[activeImageIndex];
   const t = translations[language].results;
+
+  // Clear story error when switching between variations
+  useEffect(() => {
+      setStoryError(null);
+  }, [activeImageIndex]);
+  
+  // Fetch magic edit suggestions when the component loads
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      setAreSuggestionsLoading(true);
+      try {
+        const suggestions = await getMagicEditSuggestions(era, language);
+        if (suggestions) {
+          setMagicSuggestions(suggestions);
+        } else {
+          setMagicSuggestions([]);
+        }
+      } catch (error) {
+        logger.error('SUGGESTION_FETCH_FAIL', 'Failed to fetch magic edit suggestions for UI.', { error });
+        setMagicSuggestions([]);
+      } finally {
+        setAreSuggestionsLoading(false);
+      }
+    };
+
+    fetchSuggestions();
+  }, [era, language]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!isDragging || !containerRef.current) return;
@@ -81,7 +118,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
     logger.info('IMAGE_DOWNLOAD', 'User downloaded a generated image.', { eraId: era.id, imageIndex: activeImageIndex });
     trackEvent('download_image', { category: 'Engagement', label: era.id });
   };
-
+  
   const handleMagicEdit = async () => {
       if (!editPrompt.trim()) return;
       setIsEditing(true);
@@ -108,6 +145,45 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
           setIsEditing(false);
       }
   };
+  
+  const handleGenerateStory = async () => {
+    if (storyCache[activeImageIndex]) return; // Don't regenerate if already in cache
+    
+    setIsStoryLoading(true);
+    setStoryError(null);
+    trackEvent('generate_story_start', { category: 'Feature', label: era.id });
+
+    try {
+        const result = await generateStory(activeRawImage, originalImageMimeType, era, language);
+        if (result) {
+            setStoryCache(prev => ({...prev, [activeImageIndex]: result}));
+            trackEvent('generate_story_success', { category: 'Feature', label: era.id });
+        } else {
+            setStoryError(t.story.error);
+            trackEvent('generate_story_error', { category: 'Error', label: 'no_story_returned' });
+        }
+    } catch (e) {
+        console.error(e);
+        setStoryError(t.story.error);
+        logger.error('STORY_GENERATION_FAILED', 'Story generation call failed.', { error: e });
+        trackEvent('generate_story_error', { category: 'Error', label: (e instanceof Error ? e.message : 'unknown') });
+    } finally {
+        setIsStoryLoading(false);
+    }
+  };
+
+  const getStoryContainerClass = () => {
+    const category = era.category.en;
+    switch (category) {
+        case 'Futuristic & Sci-Fi':
+            return 'bg-black/80 p-4 rounded-md border border-cyan-400/50 font-mono text-cyan-300 whitespace-pre-wrap shadow-inner shadow-cyan-500/20';
+        case 'Fantasy':
+        case 'Historical Eras':
+        default:
+            return 'bg-[#fdf6e3] p-6 rounded border-2 border-[#d2b48c]/50 text-gray-800 font-crimson text-lg shadow-inner';
+    }
+  };
+
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col items-center animate-fade-in" onMouseUp={handleMouseUp} onTouchEnd={handleMouseUp}>
@@ -173,6 +249,30 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
       <div className="w-full max-w-2xl mx-auto my-6">
         <div className="bg-gray-900/50 p-6 rounded-lg border border-purple-500/30">
           <h3 className="text-xl font-cinzel text-purple-300 mb-4 flex items-center"><Icons.Sparkles className="w-5 h-5 mr-2" /> {t.magicEdit.title}</h3>
+          
+          <div className="mb-4 flex flex-wrap justify-center items-center gap-2 min-h-[40px]">
+            {areSuggestionsLoading ? (
+              <div className="flex justify-center space-x-2 animate-pulse">
+                  <div className="h-8 w-28 bg-gray-700 rounded-full"></div>
+                  <div className="h-8 w-32 bg-gray-700 rounded-full"></div>
+                  <div className="h-8 w-24 bg-gray-700 rounded-full"></div>
+              </div>
+            ) : magicSuggestions.length > 0 && (
+              <>
+                  <span className="text-sm text-gray-400 self-center mr-2">{t.magicEdit.suggestionsLabel}</span>
+                  {magicSuggestions.map((suggestion, index) => (
+                      <button
+                          key={index}
+                          onClick={() => setEditPrompt(suggestion)}
+                          className="bg-gray-700/50 text-purple-300 text-sm px-3 py-1 rounded-full border border-gray-600 hover:bg-purple-900/50 hover:border-purple-500 transition-colors"
+                      >
+                          {suggestion}
+                      </button>
+                  ))}
+              </>
+            )}
+          </div>
+          
           <div className="flex space-x-2">
             <input type="text" value={editPrompt} onChange={(e) => setEditPrompt(e.target.value)} placeholder={t.magicEdit.prompt} className="flex-grow bg-gray-800 border border-gray-700 rounded-full px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" />
             <button onClick={handleMagicEdit} disabled={isEditing} className="bg-purple-600 text-white font-bold py-2 px-4 rounded-full hover:bg-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
@@ -183,9 +283,40 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
         </div>
       </div>
 
+      {/* Story Generation Feature */}
+      <div className="w-full max-w-2xl mx-auto my-6">
+        <div className="bg-gray-900/50 p-6 rounded-lg border border-amber-500/30">
+          <h3 className="text-xl font-cinzel text-amber-300 mb-4 flex items-center">
+            <Icons.BookOpen className="w-5 h-5 mr-2" /> {t.story.title}
+          </h3>
+          {isStoryLoading ? (
+            <div className="flex items-center justify-center text-gray-400 py-4">
+              <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mr-3"></div>
+              <span>{t.story.loading}</span>
+            </div>
+          ) : activeStory ? (
+            <div className={getStoryContainerClass()}>
+              <p>{activeStory}</p>
+            </div>
+          ) : storyError ? (
+              <p className="text-red-400 text-sm mt-2 text-center">{storyError}</p>
+          ) : (
+            <div className="text-center">
+              <button
+                onClick={handleGenerateStory}
+                className="bg-amber-600 text-white font-bold py-2 px-6 rounded-full hover:bg-amber-500 transition-colors flex items-center justify-center mx-auto transform hover:scale-105"
+              >
+                {t.story.button}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+
       <div className="w-full max-w-4xl bg-gray-900/50 p-6 rounded-lg border border-amber-500/30 mt-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <h3 className="text-2xl font-cinzel text-amber-300 mb-4 md:mb-0">{t.contextTitle}</h3>
+        <div className="mb-6">
+          <h3 className="text-2xl font-cinzel text-amber-300 text-center md:text-left">{t.contextTitle}</h3>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
             <HistoricalContextCard title={t.keyEvents} items={era.keyEvents[language]} icon={<Icons.BookOpen />} />
