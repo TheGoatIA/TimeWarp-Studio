@@ -24,10 +24,16 @@ export const translations = {
     },
     eraSelector: {
       title: 'Select Your Destination',
-      subtitle: 'Choose a universe to begin your transformation.',
+      subtitle: 'Choose one era for a classic trip, or two for a creative fusion.',
       remaining: (count: number) => `You have ${count} transformation${count === 1 ? '' : 's'} left today.`,
       dailyChallenge: "Today's Challenge!",
       surpriseMe: 'Surprise Me!',
+      selection: {
+        selected: 'Selected',
+        next: 'Next: Choose Style',
+        clear: 'Clear',
+        fusionTitle: (era1: string, era2: string) => `Fusion: ${era1} + ${era2}`,
+      },
       styleModal: {
         title: "Choose Your Style",
         subtitle: "Refine the artistic direction of your transformation.",
@@ -121,10 +127,16 @@ export const translations = {
     },
     eraSelector: {
       title: 'Choisissez Votre Destination',
-      subtitle: 'Choisissez un univers pour commencer votre transformation.',
+      subtitle: 'Choisissez une époque pour un voyage classique, ou deux pour une fusion créative.',
       remaining: (count: number) => `Il vous reste ${count} transformation${count === 1 ? '' : 's'} aujourd'hui.`,
       dailyChallenge: "Défi du Jour !",
       surpriseMe: 'Surprenez-moi !',
+      selection: {
+        selected: 'Sélectionné',
+        next: 'Suivant : Style',
+        clear: 'Effacer',
+        fusionTitle: (era1: string, era2: string) => `Fusion : ${era1} + ${era2}`,
+      },
        styleModal: {
         title: "Choisissez Votre Style",
         subtitle: "Affinez la direction artistique de votre transformation.",

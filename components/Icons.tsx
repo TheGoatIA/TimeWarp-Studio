@@ -169,8 +169,8 @@ export const Icons = {
   ),
 };
 // Remove duplicate icons and unused ones.
-delete Icons['DynasticChina'];
-delete Icons['Mesoamerican'];
-delete Icons['ArtNouveau'];
-delete Icons['Bauhaus'];
-delete Icons['The2010s'];
+delete (Icons as any)['DynasticChina'];
+delete (Icons as any)['Mesoamerican'];
+delete (Icons as any)['ArtNouveau'];
+delete (Icons as any)['Bauhaus'];
+delete (Icons as any)['The2010s'];

@@ -12,7 +12,7 @@ interface ResultViewerProps {
   originalImageMimeType: string;
   generatedImages: string[];
   rawGeneratedImages: string[];
-  era: Era;
+  eras: Era[];
   onRestart: () => void;
   language: Language;
 }
@@ -29,7 +29,7 @@ const HistoricalContextCard: React.FC<{ title: string; items: string[]; icon: Re
 );
 
 
-export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, originalImageMimeType, generatedImages, rawGeneratedImages, era, onRestart, language }) => {
+export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, originalImageMimeType, generatedImages, rawGeneratedImages, eras, onRestart, language }) => {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,12 +49,16 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
   const [magicSuggestions, setMagicSuggestions] = useState<string[]>([]);
   const [areSuggestionsLoading, setAreSuggestionsLoading] = useState(false);
   
+
   const activeGeneratedImage = editedImages[activeImageIndex] || generatedImages[activeImageIndex];
   const activeRawImage = rawEditedImages[activeImageIndex] || rawGeneratedImages[activeImageIndex];
   const activeStory = storyCache[activeImageIndex];
   const t = translations[language].results;
 
-  // Clear story error when switching between variations
+  const eraNames = eras.map(e => e.name[language]).join(' & ');
+  const eraIds = eras.map(e => e.id).join(',');
+
+  // Clear errors when switching between variations
   useEffect(() => {
       setStoryError(null);
   }, [activeImageIndex]);
@@ -64,7 +68,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
     const fetchSuggestions = async () => {
       setAreSuggestionsLoading(true);
       try {
-        const suggestions = await getMagicEditSuggestions(era, language);
+        const suggestions = await getMagicEditSuggestions(eras, language);
         if (suggestions) {
           setMagicSuggestions(suggestions);
         } else {
@@ -79,7 +83,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
     };
 
     fetchSuggestions();
-  }, [era, language]);
+  }, [eras, language]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!isDragging || !containerRef.current) return;
@@ -107,16 +111,16 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
     };
   }, []);
 
-  const handleDownload = () => {
+  const handleDownload = (dataUrl: string, filePrefix: string) => {
     const link = document.createElement('a');
-    link.href = activeGeneratedImage;
-    const eraName = era.name[language].replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    link.download = `timewarp_studio_${eraName}_${activeImageIndex + 1}.png`;
+    link.href = dataUrl;
+    const eraName = eras.map(e => e.name[language]).join('_').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    link.download = `${filePrefix}_${eraName}_${activeImageIndex + 1}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    logger.info('IMAGE_DOWNLOAD', 'User downloaded a generated image.', { eraId: era.id, imageIndex: activeImageIndex });
-    trackEvent('download_image', { category: 'Engagement', label: era.id });
+    logger.info('IMAGE_DOWNLOAD', 'User downloaded an image.', { eraIds: eraIds, type: filePrefix });
+    trackEvent('download_image', { category: 'Engagement', label: filePrefix });
   };
   
   const handleMagicEdit = async () => {
@@ -131,7 +135,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
             const watermarkedResult = await addWatermark(result);
             setEditedImages(prev => ({...prev, [activeImageIndex]: watermarkedResult}));
             setEditPrompt('');
-            trackEvent('magic_edit_success', { category: 'Feature', label: era.id });
+            trackEvent('magic_edit_success', { category: 'Feature', label: eraIds });
           } else {
             setEditError(t.magicEdit.error);
             trackEvent('magic_edit_error', { category: 'Error', label: 'no_image_returned' });
@@ -151,13 +155,13 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
     
     setIsStoryLoading(true);
     setStoryError(null);
-    trackEvent('generate_story_start', { category: 'Feature', label: era.id });
+    trackEvent('generate_story_start', { category: 'Feature', label: eraIds });
 
     try {
-        const result = await generateStory(activeRawImage, originalImageMimeType, era, language);
+        const result = await generateStory(activeRawImage, originalImageMimeType, eras, language);
         if (result) {
             setStoryCache(prev => ({...prev, [activeImageIndex]: result}));
-            trackEvent('generate_story_success', { category: 'Feature', label: era.id });
+            trackEvent('generate_story_success', { category: 'Feature', label: eraIds });
         } else {
             setStoryError(t.story.error);
             trackEvent('generate_story_error', { category: 'Error', label: 'no_story_returned' });
@@ -173,7 +177,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
   };
 
   const getStoryContainerClass = () => {
-    const category = era.category.en;
+    const category = eras[0].category.en;
     switch (category) {
         case 'Futuristic & Sci-Fi':
             return 'bg-black/80 p-4 rounded-md border border-cyan-400/50 font-mono text-cyan-300 whitespace-pre-wrap shadow-inner shadow-cyan-500/20';
@@ -189,7 +193,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
     <div className="w-full max-w-6xl mx-auto flex flex-col items-center animate-fade-in" onMouseUp={handleMouseUp} onTouchEnd={handleMouseUp}>
       <div className="text-center mb-8">
         <h2 className="text-4xl font-cinzel mb-2">{t.title}</h2>
-        <p className="text-xl text-gray-300" dangerouslySetInnerHTML={{ __html: t.subtitle(era.name[language]) }} />
+        <p className="text-xl text-gray-300" dangerouslySetInnerHTML={{ __html: t.subtitle(eraNames) }} />
       </div>
 
       <div 
@@ -218,7 +222,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
        <div className="flex items-center justify-center space-x-2 mt-4 text-white font-semibold">
           <span>{t.modern}</span>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-amber-500 rounded-full"></div>
-          <span>{era.name[language]}</span>
+          <span>{eraNames}</span>
       </div>
 
       {generatedImages.length > 1 && (
@@ -239,7 +243,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
       )}
       
       <div className="my-8 flex justify-center space-x-4">
-        <button onClick={handleDownload} className="bg-gray-800 text-amber-300 border border-amber-500/50 font-bold py-2 px-6 rounded-full flex items-center justify-center hover:bg-amber-500 hover:text-gray-900 hover:border-amber-500 transition-all duration-300 transform hover:scale-105">
+        <button onClick={() => handleDownload(activeGeneratedImage, 'timewarp_studio')} className="bg-gray-800 text-amber-300 border border-amber-500/50 font-bold py-2 px-6 rounded-full flex items-center justify-center hover:bg-amber-500 hover:text-gray-900 hover:border-amber-500 transition-all duration-300 transform hover:scale-105">
           <Icons.Download className="w-5 h-5 mr-2" />
           <span>{t.download}</span>
         </button>
@@ -286,9 +290,12 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
       {/* Story Generation Feature */}
       <div className="w-full max-w-2xl mx-auto my-6">
         <div className="bg-gray-900/50 p-6 rounded-lg border border-amber-500/30">
-          <h3 className="text-xl font-cinzel text-amber-300 mb-4 flex items-center">
-            <Icons.BookOpen className="w-5 h-5 mr-2" /> {t.story.title}
-          </h3>
+          <div className="flex justify-between items-start mb-4">
+             <h3 className="text-xl font-cinzel text-amber-300 flex items-center">
+                <Icons.BookOpen className="w-5 h-5 mr-2" /> {t.story.title}
+             </h3>
+          </div>
+          
           {isStoryLoading ? (
             <div className="flex items-center justify-center text-gray-400 py-4">
               <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mr-3"></div>
@@ -313,16 +320,21 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ originalImage, origi
         </div>
       </div>
 
-
       <div className="w-full max-w-4xl bg-gray-900/50 p-6 rounded-lg border border-amber-500/30 mt-6">
-        <div className="mb-6">
-          <h3 className="text-2xl font-cinzel text-amber-300 text-center md:text-left">{t.contextTitle}</h3>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-            <HistoricalContextCard title={t.keyEvents} items={era.keyEvents[language]} icon={<Icons.BookOpen />} />
-            <HistoricalContextCard title={t.culturalFacts} items={era.culturalFacts[language]} icon={<Icons.Globe />} />
-            <HistoricalContextCard title={t.clothingStyles} items={era.clothingStyles[language]} icon={<Icons.Clothing />} />
-        </div>
+        {eras.map((era, index) => (
+            <div key={era.id} className={index > 0 ? 'mt-8 pt-8 border-t-2 border-amber-500/20' : ''}>
+                <div className="mb-6">
+                <h3 className="text-2xl font-cinzel text-amber-300 text-center md:text-left">
+                    {t.contextTitle}: <span className="text-white">{era.name[language]}</span>
+                </h3>
+                </div>
+                <div className="grid md:grid-cols-3 gap-6">
+                    <HistoricalContextCard title={t.keyEvents} items={era.keyEvents[language]} icon={<Icons.BookOpen />} />
+                    <HistoricalContextCard title={t.culturalFacts} items={era.culturalFacts[language]} icon={<Icons.Globe />} />
+                    <HistoricalContextCard title={t.clothingStyles} items={era.clothingStyles[language]} icon={<Icons.Clothing />} />
+                </div>
+            </div>
+        ))}
       </div>
 
 

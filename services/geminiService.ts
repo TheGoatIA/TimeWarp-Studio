@@ -57,7 +57,8 @@ const generateEraImage = async (
 
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image-preview',
-        contents: [{ parts: [imagePart, textPart] }],
+        // FIX: The 'contents' payload for this model should be an object, not an array of objects.
+        contents: { parts: [imagePart, textPart] },
         config: {
             responseModalities: [Modality.IMAGE, Modality.TEXT],
         },
@@ -72,7 +73,7 @@ const generateEraImage = async (
  * Includes an intelligent retry mechanism to improve reliability.
  * @param originalImage The base64 data URL of the source image.
  * @param originalImageMimeType The MIME type of the source image.
- * @param era The selected era for transformation.
+ * @param eras The selected era(s) for transformation.
  * @param options Additional transformation options.
  * @param language The selected language for prompt generation.
  * @param sessionId A unique identifier for this transformation session.
@@ -81,18 +82,28 @@ const generateEraImage = async (
 export const transformImage = async (
     originalImage: string,
     originalImageMimeType: string,
-    era: Era,
+    eras: Era[],
     options: TransformationOptions,
     language: Language,
     sessionId: string
 ): Promise<string | null> => {
     try {
+        if (eras.length === 0) throw new Error("No eras provided for transformation.");
+
         const base64Data = getBase64(originalImage);
-        const allStyles = era.styles[language];
+        // Use the styles of the first selected era as the base for variations.
+        const allStyles = eras[0].styles[language];
         const primaryStyle = options.style;
 
         const buildPrompt = (style: string): string => {
-            return `Transform the person in the provided image to fit the ${era.name[language]} era (${era.period[language]}). Style: ${style}. Artistic style: ${options.artisticStyle}. Environment: ${options.environment}. Photographic filter: ${options.filter}. Context: ${era.description[language]}. Ensure the person's face is clearly visible and recognizable. The output must be only the image, with no text or borders.`;
+            if (eras.length > 1) {
+                // Fusion prompt
+                return `Transform the person in the provided image into a fascinating fusion of two distinct eras: the "${eras[0].name[language]}" era (${eras[0].period[language]}) and the "${eras[1].name[language]}" era (${eras[1].period[language]}). Creatively blend the clothing styles, aesthetics, and atmosphere of both periods. For example, think 'Victorian Samurai' or 'Renaissance Cyborg'. The overall artistic style should be: ${options.artisticStyle}. The environment should be a hybrid of "${eras[0].name[language]}" and "${eras[1].name[language]}" settings. Photographic filter: ${options.filter}. Contexts: "${eras[0].description[language]}" and "${eras[1].description[language]}". Ensure the person's face is clearly visible and recognizable. The output must be only the image, with no text or borders.`;
+            } else {
+                // Single era prompt
+                const era = eras[0];
+                return `Transform the person in the provided image to fit the ${era.name[language]} era (${era.period[language]}). Style: ${style}. Artistic style: ${options.artisticStyle}. Environment: ${options.environment}. Photographic filter: ${options.filter}. Context: ${era.description[language]}. Ensure the person's face is clearly visible and recognizable. The output must be only the image, with no text or borders.`;
+            }
         };
 
         // --- First Attempt ---
@@ -100,12 +111,12 @@ export const transformImage = async (
         let imageUrl = await generateEraImage(base64Data, originalImageMimeType, primaryPrompt);
         
         if (imageUrl) {
-            logger.info('GEMINI_TRANSFORM_SUCCESS', 'Image transformed successfully on first attempt.', { era: era.id, style: primaryStyle, sessionId });
+            logger.info('GEMINI_TRANSFORM_SUCCESS', 'Image transformed successfully on first attempt.', { eras: eras.map(e=>e.id), style: primaryStyle, sessionId });
             return imageUrl;
         }
 
         // --- Retry Logic ---
-        logger.warn('GEMINI_TRANSFORM_NO_IMAGE_RETRY', 'First attempt returned no image. Retrying with a fallback style.', { era: era.id, style: primaryStyle, sessionId });
+        logger.warn('GEMINI_TRANSFORM_NO_IMAGE_RETRY', 'First attempt returned no image. Retrying with a fallback style.', { eras: eras.map(e=>e.id), style: primaryStyle, sessionId });
 
         // Find a different style to use for the retry attempt.
         const fallbackStyle = allStyles.find(s => s !== primaryStyle) || 'a different artistic interpretation';
@@ -114,12 +125,12 @@ export const transformImage = async (
         imageUrl = await generateEraImage(base64Data, originalImageMimeType, fallbackPrompt);
 
         if (imageUrl) {
-            logger.info('GEMINI_TRANSFORM_SUCCESS_RETRY', 'Image transformed successfully on retry.', { era: era.id, style: fallbackStyle, sessionId });
+            logger.info('GEMINI_TRANSFORM_SUCCESS_RETRY', 'Image transformed successfully on retry.', { eras: eras.map(e=>e.id), style: fallbackStyle, sessionId });
             return imageUrl;
         }
         
         // If both attempts fail, log it and return null.
-        logger.warn('GEMINI_TRANSFORM_NO_IMAGE_FINAL', 'All transformation attempts failed to return an image.', { era: era.id, sessionId });
+        logger.warn('GEMINI_TRANSFORM_NO_IMAGE_FINAL', 'All transformation attempts failed to return an image.', { eras: eras.map(e=>e.id), sessionId });
         return null;
 
     } catch (error) {
@@ -156,7 +167,8 @@ export const editImage = async (
         // FIX: Use gemini-2.5-flash-image-preview for image editing as per guidelines.
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash-image-preview',
-            contents: [{ parts: [imagePart, textPart] }],
+            // FIX: The 'contents' payload for this model should be an object, not an array of objects.
+            contents: { parts: [imagePart, textPart] },
             config: {
                 responseModalities: [Modality.IMAGE, Modality.TEXT],
             },
@@ -182,18 +194,19 @@ export const editImage = async (
  * Generates a creative story based on a transformed image.
  * @param base64Image The base64 data URL of the transformed image.
  * @param mimeType The MIME type of the image.
- * @param era The era context for the story.
+ * @param eras The era(s) context for the story.
  * @param language The language for the story.
  * @returns A promise that resolves to the generated story string, or null on failure.
  */
 export const generateStory = async (
     base64Image: string,
     mimeType: string,
-    era: Era,
+    eras: Era[],
     language: Language
 ): Promise<string | null> => {
     try {
-        logger.info('GEMINI_STORY_START', 'Starting story generation.', { era: era.id });
+        if (eras.length === 0) return null;
+        logger.info('GEMINI_STORY_START', 'Starting story generation.', { eras: eras.map(e => e.id) });
 
         const imagePart = {
             inlineData: {
@@ -201,16 +214,23 @@ export const generateStory = async (
                 mimeType: mimeType,
             },
         };
-
-        const prompt = language === 'fr'
-            ? `Tu es un conteur créatif. Regarde cette image d'une personne transformée pour correspondre à l'époque "${era.name.fr}". Écris une courte biographie créative d'environ 100 mots pour ce personnage, à la première personne. L'histoire doit être immersive et correspondre au style et à l'ambiance de l'image et de l'époque. La réponse doit être uniquement le texte de l'histoire.`
-            : `You are a creative storyteller. Look at this image of a person transformed to fit the "${era.name.en}" era. Write a short, creative, first-person biography of about 100 words for this character. The story should be immersive and match the style and mood of the image and the era. The response must be only the story text.`;
+        
+        let prompt: string;
+        if (language === 'fr') {
+            prompt = eras.length > 1
+                ? `Tu es un conteur créatif. Regarde cette image d'une personne qui est une fusion des époques "${eras[0].name.fr}" et "${eras[1].name.fr}". Écris une courte biographie créative d'environ 100 mots pour ce personnage unique, à la première personne. L'histoire doit être immersive, mêlant des éléments des deux mondes, et correspondre au style et à l'ambiance de l'image. La réponse doit être uniquement le texte de l'histoire.`
+                : `Tu es un conteur créatif. Regarde cette image d'une personne transformée pour correspondre à l'époque "${eras[0].name.fr}". Écris une courte biographie créative d'environ 100 mots pour ce personnage, à la première personne. L'histoire doit être immersive et correspondre au style et à l'ambiance de l'image et de l'époque. La réponse doit être uniquement le texte de l'histoire.`;
+        } else {
+            prompt = eras.length > 1
+                ? `You are a creative storyteller. Look at this image of a person who is a fusion of the "${eras[0].name.en}" and "${eras[1].name.en}" eras. Write a short, creative, first-person biography of about 100 words for this unique character. The story should be immersive, blending elements from both worlds, and match the style and mood of the image. The response must be only the story text.`
+                : `You are a creative storyteller. Look at this image of a person transformed to fit the "${eras[0].name.en}" era. Write a short, creative, first-person biography of about 100 words for this character. The story should be immersive and match the style and mood of the image and the era. The response must be only the story text.`;
+        }
         
         const textPart = { text: prompt };
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: [{ parts: [imagePart, textPart] }],
+            contents: { parts: [imagePart, textPart] },
         });
         
         const storyText = response.text;
@@ -231,25 +251,33 @@ export const generateStory = async (
 };
 
 /**
- * Generates creative "Magic Edit" suggestions for a given era.
- * @param era The era to generate suggestions for.
+ * Generates creative "Magic Edit" suggestions for a given era or era fusion.
+ * @param eras The era(s) to generate suggestions for.
  * @param language The language for the suggestions.
  * @returns A promise that resolves to an array of suggestion strings, or null on failure.
  */
 export const getMagicEditSuggestions = async (
-    era: Era,
+    eras: Era[],
     language: Language
 ): Promise<string[] | null> => {
     try {
-        logger.info('GEMINI_SUGGESTIONS_START', 'Starting magic edit suggestion generation.', { era: era.id });
+        if (eras.length === 0) return null;
+        logger.info('GEMINI_SUGGESTIONS_START', 'Starting magic edit suggestion generation.', { eras: eras.map(e => e.id) });
         
-        const prompt = language === 'fr'
-            ? `Pour un personnage de l'époque "${era.name.fr}", propose exactement 3 modifications visuelles amusantes et concises à ajouter à son portrait. Exemples : 'ajoute une couronne de laurier', 'donne-lui un monocle'.`
-            : `For a character from the "${era.name.en}" era, suggest exactly 3 fun, concise visual modifications to add to their portrait. Examples: 'add a laurel wreath', 'give him a monocle'.`;
+        let prompt: string;
+        if (language === 'fr') {
+            prompt = eras.length > 1
+                ? `Pour un personnage qui est une fusion des époques "${eras[0].name.fr}" et "${eras[1].name.fr}", propose exactement 3 modifications visuelles amusantes et concises à ajouter à son portrait qui mélangent des éléments des deux mondes.`
+                : `Pour un personnage de l'époque "${eras[0].name.fr}", propose exactement 3 modifications visuelles amusantes et concises à ajouter à son portrait. Exemples : 'ajoute une couronne de laurier', 'donne-lui un monocle'.`;
+        } else {
+            prompt = eras.length > 1
+                ? `For a character who is a fusion of the "${eras[0].name.en}" and "${eras[1].name.en}" eras, suggest exactly 3 fun, concise visual modifications to add to their portrait that blend elements from both worlds.`
+                : `For a character from the "${eras[0].name.en}" era, suggest exactly 3 fun, concise visual modifications to add to their portrait. Examples: 'add a laurel wreath', 'give him a monocle'.`;
+        }
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: [{ parts: [{ text: prompt }] }],
+            contents: prompt,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {

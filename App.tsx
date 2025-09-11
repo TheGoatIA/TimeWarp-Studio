@@ -24,7 +24,7 @@ const App: React.FC = () => {
   const [originalImageMimeType, setOriginalImageMimeType] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [rawGeneratedImages, setRawGeneratedImages] = useState<string[]>([]);
-  const [selectedEra, setSelectedEra] = useState<Era | null>(null);
+  const [selectedEras, setSelectedEras] = useState<Era[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [remainingTransforms, setRemainingTransforms] = useState(DAILY_TRANSFORMATION_LIMIT);
@@ -73,11 +73,12 @@ const App: React.FC = () => {
     updateRemainingTransforms();
   };
 
-  const handleEraSelect = useCallback(async (era: Era, artisticStyle: string) => {
-    if (!originalImage || !originalImageMimeType || !language) return;
+  const handleErasSelect = useCallback(async (eras: Era[], artisticStyle: string) => {
+    if (!originalImage || !originalImageMimeType || !language || eras.length === 0) return;
     const sessionId = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
-    logger.info('ERA_SELECTED', 'User selected an era to transform.', { era: era.id, artisticStyle, sessionId });
-    trackEvent('transformation_start', { category: 'Transformation', label: era.id, value: 1 });
+    const eraIds = eras.map(e => e.id).join(',');
+    logger.info('ERAS_SELECTED', 'User selected era(s) to transform.', { eras: eraIds, artisticStyle, sessionId });
+    trackEvent('transformation_start', { category: 'Transformation', label: eraIds, value: 1 });
     
     const today = new Date().toISOString().split('T')[0];
     let usageData = { date: '', count: 0 };
@@ -95,17 +96,18 @@ const App: React.FC = () => {
       const limitError = translations[language].error.limitReached;
       setError(limitError);
       logger.warn('LIMIT_REACHED', 'User attempted transformation but has reached the daily limit.', { sessionId });
-      trackEvent('transformation_limit_reached', { category: 'Error', label: era.id });
+      trackEvent('transformation_limit_reached', { category: 'Error', label: eraIds });
       return;
     }
     
-    setSelectedEra(era);
+    setSelectedEras(eras);
     setIsLoading(true);
     setError(null);
     setGeneratedImages([]);
 
     try {
-        const variationStyles = era.styles[language].slice(0, 1);
+        // Use the styles from the first selected era as the base for variations.
+        const variationStyles = eras[0].styles[language].slice(0, 1);
         if (variationStyles.length === 0) {
           variationStyles.push('Default Style');
         }
@@ -118,7 +120,7 @@ const App: React.FC = () => {
                 filter: 'Era-appropriate photographic style',
                 artisticStyle: artisticStyle
             };
-            return transformImage(originalImage, originalImageMimeType, era, options, language, sessionId);
+            return transformImage(originalImage, originalImageMimeType, eras, options, language, sessionId);
         });
 
         const results = await Promise.all(transformationPromises);
@@ -132,7 +134,7 @@ const App: React.FC = () => {
           logger.info('USAGE_INCREMENTED', 'User transformation count incremented upon success.', { newCount, sessionId });
 
           logger.info('TRANSFORMATION_SUCCESS', 'Successfully generated images from Gemini API.', { count: successfulResults.length, sessionId });
-          trackEvent('transformation_success', { category: 'Transformation', label: era.id, value: successfulResults.length });
+          trackEvent('transformation_success', { category: 'Transformation', label: eraIds, value: successfulResults.length });
           
           setRawGeneratedImages(successfulResults);
           const watermarkedImages = await Promise.all(
@@ -163,7 +165,7 @@ const App: React.FC = () => {
     setOriginalImageMimeType(null);
     setGeneratedImages([]);
     setRawGeneratedImages([]);
-    setSelectedEra(null);
+    setSelectedEras(null);
     setError(null);
   };
 
@@ -173,7 +175,7 @@ const App: React.FC = () => {
     }
 
     if (isLoading) {
-      return <LoadingIndicator era={selectedEra} language={language} />;
+      return <LoadingIndicator eras={selectedEras} language={language} />;
     }
     
     const t = translations[language];
@@ -198,15 +200,15 @@ const App: React.FC = () => {
           </div>
         );
       case 'SELECT_ERA':
-        return <EraSelector onEraSelect={handleEraSelect} language={language} remainingTransforms={remainingTransforms} />;
+        return <EraSelector onErasSelect={handleErasSelect} language={language} remainingTransforms={remainingTransforms} />;
       case 'VIEW_RESULT':
-        if (originalImage && generatedImages.length > 0 && selectedEra && originalImageMimeType) {
+        if (originalImage && generatedImages.length > 0 && selectedEras && originalImageMimeType) {
           return <ResultViewer 
                     originalImage={originalImage} 
                     originalImageMimeType={originalImageMimeType}
                     generatedImages={generatedImages}
                     rawGeneratedImages={rawGeneratedImages}
-                    era={selectedEra} 
+                    eras={selectedEras} 
                     onRestart={handleRestart} 
                     language={language} 
                  />;

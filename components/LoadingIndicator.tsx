@@ -3,7 +3,7 @@ import type { Era, Language } from '../types';
 import { Icons } from './Icons';
 
 interface LoadingIndicatorProps {
-  era: Era | null;
+  eras: Era[] | null;
   language: Language;
 }
 
@@ -28,7 +28,7 @@ const loadingMessages = {
   ]
 };
 
-export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ era, language }) => {
+export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ eras, language }) => {
   const [messageIndex, setMessageIndex] = useState(0);
   const messages = loadingMessages[language];
 
@@ -39,9 +39,10 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ era, languag
     return () => clearInterval(interval);
   }, [messages.length]);
 
+  const eraNames = eras?.map(e => e.name[language]).join(' & ') || (language === 'fr' ? 'le passé' : 'the past');
   const titleText = language === 'fr' 
-    ? `Voyage vers ${era?.name.fr || 'le passé'}...`
-    : `Traveling to the ${era?.name.en || 'past'}...`;
+    ? `Voyage vers ${eraNames}...`
+    : `Traveling to ${eraNames}...`;
 
   return (
     <div className="text-center flex flex-col items-center justify-center animate-fade-in">
